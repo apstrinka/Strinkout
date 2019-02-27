@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SeekBarPreference
-        android:key="seektest"
-        android:title="Seek Test"
-        android:min="0"
-        android:max="100"
-        android:defaultValue="50"/>
+        android:key="exercise_seconds"
+        android:title="Exercise duration in seconds"
+        android:min="10"
+        android:max="180"
+        android:defaultValue="30"/>
+    <SeekBarPreference
+        android:key="transition_seconds"
+        android:title="Transition duration in seconds"
+        android:min="1"
+        android:max="30"
+        android:defaultValue="5"/>
+    <SwitchPreferenceCompat
+        android:key="has_rests"
+        android:title="Rest Breaks"
+        android:defaultValue="true"/>
+    <SeekBarPreference
+        android:key="rest_seconds"
+        android:dependency="has_rests"
+        android:title="Rest duration in seconds"
+        android:min="5"
+        android:max="120"
+        android:defaultValue="30"/>
+    <SeekBarPreference
+        android:key="rest_after"
+        android:dependency="has_rests"
+        android:title="Rest after X exercises"
+        android:min="1"
+        android:max="20"
+        android:defaultValue="5"/>
+    <SwitchPreferenceCompat
+        android:key="rests_count"
+        android:dependency="has_rests"
+        android:title="Rests count against total time"
+        android:defaultValue="false"/>
 
 </androidx.preference.PreferenceScreen>

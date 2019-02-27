@@ -1,7 +1,9 @@
 package net.strinka.strinkout
 
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
@@ -11,10 +13,10 @@ import java.util.*
 
 class WorkoutActivity : AppCompatActivity() {
     private var tts : TextToSpeech? = null;
-    private val exerciseSeconds: Long = 30
-    private val transitionSeconds: Long = 5
-    private val restSeconds: Long = 30
-    private val restAfter: Long = 5
+    private var exerciseSeconds: Long = 30
+    private var transitionSeconds: Long = 5
+    private var restSeconds: Long = 30
+    private var restAfter = 5
     private var minutes: Long = 15
     private var currentTimer: PausableTimer? = null
     private var totalElapsed: Long = 0
@@ -34,6 +36,12 @@ class WorkoutActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout)
 
+        var preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        exerciseSeconds = Math.max(preferences.getInt("exercise_seconds", 30).toLong(), 10)
+        transitionSeconds = Math.max(preferences.getInt("transition_seconds", 5).toLong(), 1)
+        restSeconds = Math.max(preferences.getInt("rest_seconds", 30).toLong(), 5)
+        restAfter = Math.max(preferences.getInt("rest_after", 5), 1)
+
         val initListener = TextToSpeech.OnInitListener {
             fun onInit(status: Int) {
                 if (status != TextToSpeech.ERROR) {
@@ -51,6 +59,11 @@ class WorkoutActivity : AppCompatActivity() {
         exerciseIndex = 0
         exercisesSinceRest = 0
         currentActivityType = ActivityType.TRANSITION
+    }
+
+    override fun onStop() {
+        currentTimer?.pause()
+        super.onStop()
     }
 
     fun start(view: View) {

@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun selectSettingsItem(): Boolean{
-        Log.d("MyTag", "Select Settings")
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent);
         return true
