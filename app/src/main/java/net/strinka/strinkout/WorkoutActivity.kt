@@ -15,14 +15,19 @@ class WorkoutActivity : AppCompatActivity() {
     private var tts : TextToSpeech? = null;
     private var exerciseSeconds: Long = 30
     private var transitionSeconds: Long = 5
+    private var hasRests = true
     private var restSeconds: Long = 30
     private var restAfter = 5
+    private var restsCount = false
     private var minutes: Long = 15
     private var currentTimer: PausableTimer? = null
     private var totalElapsed: Long = 0
     private var exerciseIndex = 0
     private var exercisesSinceRest = 0
     private var currentActivityType = ActivityType.TRANSITION
+    private var currentActivityDuration: Long = 0
+    private var currentExercise = ""
+    private var nextExercise = ""
     private var exerciseList = mutableListOf("Reverse Plank", "Power Circles", "Push-up and Rotation", "Lying Tricep Lifts", "Spiderman Push-up", "T Raise",
         "Shoulder Tap Push-ups", "Chest Expander", "Dive Bomber Push-ups", "Jumping Jacks", "Wall Push-ups", "Alternating Push-up Plank", "Tricep Dips", "Wide Arm Push-ups",
         "Overhead Arm Clap", "Diamond Push-ups", "Overhead Press", "Push-ups", "Wall Sit", "Butt Kickers", "High Knees", "Genie Sit", "Calf Raises", "Frog Jumps",
@@ -39,8 +44,12 @@ class WorkoutActivity : AppCompatActivity() {
         var preferences = PreferenceManager.getDefaultSharedPreferences(this)
         exerciseSeconds = Math.max(preferences.getInt("exercise_seconds", 30).toLong(), 10)
         transitionSeconds = Math.max(preferences.getInt("transition_seconds", 5).toLong(), 1)
+        hasRests = preferences.getBoolean("has_rests", true)
         restSeconds = Math.max(preferences.getInt("rest_seconds", 30).toLong(), 5)
         restAfter = Math.max(preferences.getInt("rest_after", 5), 1)
+        restsCount = preferences.getBoolean("rests_count", false)
+        if (!hasRests)
+            restAfter = Int.MAX_VALUE
 
         val initListener = TextToSpeech.OnInitListener {
             fun onInit(status: Int) {
@@ -54,11 +63,12 @@ class WorkoutActivity : AppCompatActivity() {
         val message = intent.getStringExtra(EXTRA_MESSAGE)
         minutes = message.toLong()
         exerciseList.shuffle()
-        val placeholderText = findViewById<TextView>(R.id.total_time_remaing)
-        placeholderText.text = minutes.toString() + ":00.00"
+        findViewById<TextView>(R.id.total_time_remaing).text = minutes.toString() + ":00.00"
         exerciseIndex = 0
         exercisesSinceRest = 0
         currentActivityType = ActivityType.TRANSITION
+        nextExercise = exerciseList[0]
+        findViewById<TextView>(R.id.next_exercise).text = nextExercise
     }
 
     override fun onStop() {
@@ -83,7 +93,7 @@ class WorkoutActivity : AppCompatActivity() {
         findViewById<Button>(R.id.pause_button).isEnabled = false
     }
 
-    fun millisToString(millis: Long) : String{
+    private fun millisToString(millis: Long) : String{
         val min = millis / 60000
         val sec = (millis % 60000) / 1000
         val cen = (millis % 1000) / 10
@@ -93,7 +103,33 @@ class WorkoutActivity : AppCompatActivity() {
             return "$sec.${cen.toString().padStart(2, '0')}"
     }
 
-    fun startNextActivity(){
+    private fun doesCurrentActivityCount() : Boolean{
+        return when (currentActivityType){
+            ActivityType.TRANSITION -> false
+            ActivityType.EXERCISE -> true
+            ActivityType.REST -> restsCount
+            ActivityType.FINISHED -> false
+        }
+    }
+
+    private val onTick = fun(millisElapsed: Long){
+        var millisLeft = currentActivityDuration - millisElapsed
+        findViewById<TextView>(R.id.current_time_remaing).text = millisToString(millisLeft)
+        if (doesCurrentActivityCount()){
+            var totalMillisLeft = minutes * 60000 - millisElapsed - totalElapsed
+            findViewById<TextView>(R.id.total_time_remaing).text = millisToString(totalMillisLeft)
+        }
+    }
+
+    private val onFinish = fun(){
+        if (doesCurrentActivityCount()){
+            totalElapsed += currentActivityDuration
+            findViewById<TextView>(R.id.total_time_remaing).text = millisToString(minutes*60000 - totalElapsed)
+            if (totalElapsed >= minutes*60000){
+                finishWorkout()
+                return
+            }
+        }
         when(currentActivityType){
             ActivityType.TRANSITION -> {
                 startNextExercise()
@@ -109,101 +145,79 @@ class WorkoutActivity : AppCompatActivity() {
                 startNextExercise()
             }
         }
-
     }
 
-    fun startTransition(){
-        val onTick = fun(millisElapsed: Long){
-            var millisLeft = transitionSeconds * 1000 - millisElapsed
-            findViewById<TextView>(R.id.current_time_remaing).text = millisToString(millisLeft)
+    private fun speak(text: String): () -> Unit{
+        return {
+            tts?.speak(text, TextToSpeech.QUEUE_ADD, null)
         }
+    }
 
-        val onFinish = fun(){
-            startNextActivity()
+    private fun addCountdown(seconds: Int){
+        for (i in 1..seconds){
+            currentTimer?.addEvent(currentActivityDuration - i*1000, speak(i.toString()))
         }
+    }
 
+    private fun startTransition(){
         currentActivityType = ActivityType.TRANSITION
+        currentActivityDuration = transitionSeconds*1000
         findViewById<TextView>(R.id.current_activity).text = "Transition"
         tts?.speak(exerciseList[exerciseIndex], TextToSpeech.QUEUE_ADD, null)
-        currentTimer = PausableTimer(30, transitionSeconds*1000, onTick, onFinish)
+        currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         currentTimer?.start()
     }
 
-    fun startNextExercise(){
-        val onTick = fun(millisElapsed: Long){
-            var millisLeft = exerciseSeconds * 1000 - millisElapsed
-            findViewById<TextView>(R.id.current_time_remaing).text = millisToString(millisLeft)
-            var totalMillisLeft = minutes * 60000 - millisElapsed - totalElapsed
-            findViewById<TextView>(R.id.total_time_remaing).text = millisToString(totalMillisLeft)
-        }
-
-        val onFinish = fun(){
-            totalElapsed = totalElapsed + exerciseSeconds*1000
-            findViewById<TextView>(R.id.total_time_remaing).text = millisToString(minutes*60000 - totalElapsed)
-            if (totalElapsed < minutes*60000) {
-                startNextActivity()
-            } else {
-                endWorkout()
-            }
-        }
-
-        currentActivityType = ActivityType.EXERCISE
-        findViewById<TextView>(R.id.current_activity).text = exerciseList[exerciseIndex]
-
-        if (exerciseIndex >= exerciseList.size-2){
-            exerciseIndex = -1
+    private fun updateNextExercise(){
+        exerciseIndex += 1
+        if (exerciseIndex >= exerciseList.size){
+            exerciseIndex = 0
             exerciseList.shuffle()
         }
+        nextExercise = exerciseList[exerciseIndex]
+    }
 
-        if (totalElapsed + exerciseSeconds*1000 >= minutes*60000){
+    private fun startNextExercise(){
+        currentActivityType = ActivityType.EXERCISE
+        currentActivityDuration =  exerciseSeconds*1000
+        currentExercise = nextExercise
+        updateNextExercise()
+        exercisesSinceRest += 1
+
+        findViewById<TextView>(R.id.current_activity).text = currentExercise
+
+        if (totalElapsed + currentActivityDuration >= minutes*60000){
             findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
-        } else if (exercisesSinceRest + 1 >= restAfter){
+        } else if (exercisesSinceRest >= restAfter){
             findViewById<TextView>(R.id.next_exercise).text = "Rest"
         } else {
-            findViewById<TextView>(R.id.next_exercise).text = exerciseList[exerciseIndex + 1]
+            findViewById<TextView>(R.id.next_exercise).text = nextExercise
         }
-        exerciseIndex += 1
 
-        exercisesSinceRest += 1
+
         tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
-        currentTimer = PausableTimer(30, exerciseSeconds*1000, onTick, onFinish)
-        if (exercisesSinceRest < restAfter && totalElapsed + exerciseSeconds*1000 < minutes*60000) {
-            currentTimer?.addEvent((exerciseSeconds - 10) * 1000, {
-                tts?.speak("Next exercise. " + exerciseList[exerciseIndex], TextToSpeech.QUEUE_ADD, null)
-            })
+        currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
+        if (exercisesSinceRest < restAfter && totalElapsed + currentActivityDuration < minutes*60000) {
+            currentTimer?.addEvent((exerciseSeconds - 10) * 1000, speak("Next exercise. " + exerciseList[exerciseIndex]))
         }
-        currentTimer?.addEvent((exerciseSeconds-3)*1000, {tts?.speak("Three", TextToSpeech.QUEUE_ADD, null)})
-        currentTimer?.addEvent((exerciseSeconds-2)*1000, {tts?.speak("Two", TextToSpeech.QUEUE_ADD, null)})
-        currentTimer?.addEvent((exerciseSeconds-1)*1000, {tts?.speak("One", TextToSpeech.QUEUE_ADD, null)})
+        addCountdown(3)
         currentTimer?.start()
     }
 
-    fun startRest(){
-        val onTick = fun(millisElapsed: Long){
-            var millisLeft = restSeconds * 1000 - millisElapsed
-            findViewById<TextView>(R.id.current_time_remaing).text = millisToString(millisLeft)
-        }
-
-        val onFinish = fun(){
-            startNextActivity()
-        }
-
+    private fun startRest(){
         currentActivityType = ActivityType.REST
+        currentActivityDuration = restSeconds*1000
         findViewById<TextView>(R.id.current_activity).text = "Rest"
         findViewById<TextView>(R.id.next_exercise).text = exerciseList[exerciseIndex]
         exercisesSinceRest = 0
         tts?.speak("Rest for " + restSeconds + " seconds", TextToSpeech.QUEUE_ADD, null)
-        currentTimer = PausableTimer(30, restSeconds*1000, onTick, onFinish)
-        currentTimer?.addEvent((restSeconds-10)*1000, {
-            tts?.speak("Next exercise. " + exerciseList[exerciseIndex], TextToSpeech.QUEUE_ADD, null)
-        })
-        currentTimer?.addEvent((restSeconds-3)*1000, {tts?.speak("Three", TextToSpeech.QUEUE_ADD, null)})
-        currentTimer?.addEvent((restSeconds-2)*1000, {tts?.speak("Two", TextToSpeech.QUEUE_ADD, null)})
-        currentTimer?.addEvent((restSeconds-1)*1000, {tts?.speak("One", TextToSpeech.QUEUE_ADD, null)})
+        currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
+        currentTimer?.addEvent((restSeconds-10)*1000, speak("Next exercise. " + exerciseList[exerciseIndex]))
+        addCountdown(3)
         currentTimer?.start()
     }
 
-    fun endWorkout(){
+    private fun finishWorkout(){
         tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null)
         findViewById<TextView>(R.id.current_time_remaing).text = millisToString(0)
         findViewById<TextView>(R.id.current_activity).text = "Congrats!"

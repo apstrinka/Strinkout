@@ -91,7 +91,7 @@ class PausableTimer {
             tickHandler.sendMessage(tickHandler.obtainMessage(MSG))
             for ((index,value) in events.withIndex()){
                 val time = value.first
-                if (time > elapsed) {
+                if (time >= elapsed) {
                     eventHandler.sendMessageDelayed(eventHandler.obtainMessage(index), time - elapsed)
                 }
             }
@@ -113,7 +113,7 @@ class PausableTimer {
     @Synchronized
     fun addEvent(time: Long, event: () -> Unit){
         val currentTime = getCurrentElapsed()
-        if (time > currentTime && time < endAt){
+        if (time >= currentTime && time < endAt){
             if (running) {
                 eventHandler.sendMessageDelayed(eventHandler.obtainMessage(events.size), time - currentTime)
             }
