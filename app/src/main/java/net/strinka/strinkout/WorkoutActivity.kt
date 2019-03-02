@@ -28,14 +28,7 @@ class WorkoutActivity : AppCompatActivity() {
     private var currentActivityDuration: Long = 0
     private var currentExercise = ""
     private var nextExercise = ""
-    private var exerciseList = mutableListOf("Reverse Plank", "Power Circles", "Push-up and Rotation", "Lying Tricep Lifts", "Spiderman Push-up", "T Raise",
-        "Shoulder Tap Push-ups", "Chest Expander", "Dive Bomber Push-ups", "Jumping Jacks", "Wall Push-ups", "Alternating Push-up Plank", "Tricep Dips", "Wide Arm Push-ups",
-        "Overhead Arm Clap", "Diamond Push-ups", "Overhead Press", "Push-ups", "Wall Sit", "Butt Kickers", "High Knees", "Genie Sit", "Calf Raises", "Frog Jumps",
-        "Side to Side Knee Lifts", "High Jumper", "Hip Raise", "Reverse V Lunges", "Running in Place", "Front Kicks", "Mountain Climbers", "Rear Lunges",
-        "Forward Lunges", "Jump Squats", "Squats", "Scissor Kicks", "Six Inches and Hold", "In and Out Abs", "Steam Engine", "Mason Twist", "Swimmer", "Quadruplex",
-        "Bent Leg Twist", "Windmill", "Supermans", "Inch Worms", "Twisting Crunches", "Burpees", "Plank", "Supine Bicycle", "Leg Lifts", "Leg Spreaders",
-        "Elevated Crunches", "V Sit-ups", "Sit-ups")
-    //"One Arm Side Push-up", "Side Bridge", "Single Leg Squats", "Side Leg Lifts",
+    private var exerciseList: MutableList<Exercise> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,15 +54,19 @@ class WorkoutActivity : AppCompatActivity() {
             }
         }
         tts = TextToSpeech(getApplicationContext(), initListener)
-        val message = intent.getStringExtra(EXTRA_MESSAGE)
+        val message = intent.getStringExtra(MESSAGE_TIME)
         totalTimeLeft = message.toLong()*60000
-        exerciseList.shuffle()
         findViewById<TextView>(R.id.total_time_remaing).text = millisToString(totalTimeLeft)
+
+        var workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
+        exerciseList = defaultWorkouts[workoutIndex].exercises.toMutableList()
+        exerciseList.shuffle()
         exerciseIndex = 0
         exercisesSinceRest = 0
         currentActivityType = ActivityType.TRANSITION
-        nextExercise = exerciseList[0]
+        nextExercise = exerciseList[0].name
         findViewById<TextView>(R.id.next_exercise).text = nextExercise
+
     }
 
     override fun onStop() {
@@ -79,7 +76,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun start(view: View) {
         if (currentTimer == null) {
-            findViewById<TextView>(R.id.next_exercise).text = exerciseList[0]
+            findViewById<TextView>(R.id.next_exercise).text = exerciseList[0].name
             tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null)
             startTransition()
         }
@@ -164,7 +161,7 @@ class WorkoutActivity : AppCompatActivity() {
         currentActivityType = ActivityType.TRANSITION
         currentActivityDuration = transitionMillis
         findViewById<TextView>(R.id.current_activity).text = "Transition"
-        tts?.speak(exerciseList[exerciseIndex], TextToSpeech.QUEUE_ADD, null)
+        tts?.speak(exerciseList[exerciseIndex].name, TextToSpeech.QUEUE_ADD, null)
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         currentTimer?.start()
     }
@@ -175,7 +172,7 @@ class WorkoutActivity : AppCompatActivity() {
             exerciseIndex = 0
             exerciseList.shuffle()
         }
-        nextExercise = exerciseList[exerciseIndex]
+        nextExercise = exerciseList[exerciseIndex].name
     }
 
     private fun startNextExercise(){
@@ -208,11 +205,13 @@ class WorkoutActivity : AppCompatActivity() {
     private fun startRest(){
         currentActivityType = ActivityType.REST
         currentActivityDuration = restMillis
-        if (restsCount && totalTimeLeft < restMillis){
-            currentActivityDuration = totalTimeLeft
-        }
         findViewById<TextView>(R.id.current_activity).text = "Rest"
-        findViewById<TextView>(R.id.next_exercise).text = exerciseList[exerciseIndex]
+        findViewById<TextView>(R.id.next_exercise).text = exerciseList[exerciseIndex].name
+        if (restsCount && totalTimeLeft <= restMillis){
+            currentActivityDuration = totalTimeLeft
+            findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
+        }
+
         exercisesSinceRest = 0
         tts?.speak("Rest for $restSeconds seconds", TextToSpeech.QUEUE_ADD, null)
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)

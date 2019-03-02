@@ -23,17 +23,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-        val initListener = TextToSpeech.OnInitListener {
-            fun onInit(status: Int) {
-                if (status != TextToSpeech.ERROR) {
-                    tts?.setLanguage(Locale.UK);
-                    tts?.setSpeechRate(0.8f)
-                }
-            }
-        }
-
-        tts = TextToSpeech(getApplicationContext(), initListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -58,17 +47,22 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun selectWorkout(view: View) {
-        val intent = Intent(this, SelectionActivity::class.java)
-        startActivity(intent);
+    fun selectStandard(view: View){
+        selectWorkout(0)
     }
 
-    fun testSpeech(view: View) {
-        val editText = findViewById<EditText>(R.id.speech_test)
-        val toSpeak = editText.getText().toString()
-        Toast.makeText(applicationContext, toSpeak, Toast.LENGTH_SHORT).show()
-        tts?.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null)
+    fun selectBeginner(view: View){
+        selectWorkout(1)
     }
 
+    fun selectAdvanced(view: View){
+        selectWorkout(2)
+    }
 
+    private fun selectWorkout(workoutIndex: Int) {
+        val intent = Intent(this, SelectionActivity::class.java).apply {
+            putExtra(MESSAGE_WORKOUT, workoutIndex)
+        }
+        startActivity(intent)
+    }
 }

@@ -36,32 +36,20 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="selectWorkout"
-            android:text="Lorem" />
+            android:onClick="selectStandard"
+            android:text="Standard" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ipsum" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Text to Speech Test"
-            android:textColor="#000"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/speech_test"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Text to speak" />
+            android:onClick="selectBeginner"
+            android:text="Beginner" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Speak"
-            android:onClick="testSpeech"/>
+            android:onClick="selectAdvanced"
+            android:text="Advanced" />
 
     </LinearLayout>
 
