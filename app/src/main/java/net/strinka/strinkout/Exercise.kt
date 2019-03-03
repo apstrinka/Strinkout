@@ -92,7 +92,7 @@ val allExercises = listOf(
     Exercise("Up Downs"),
     Exercise("V Balance"),
     Exercise("V Sit-ups"),
-    Exercise("Vertial Arm Rotations"),
+    Exercise("Vertical Arm Rotations"),
     Exercise("Wall Push-ups"),
     Exercise("Wall Sit"),
     Exercise("Wide Arm Push-ups"),

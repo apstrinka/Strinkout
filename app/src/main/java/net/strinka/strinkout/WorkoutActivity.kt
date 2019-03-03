@@ -140,7 +140,7 @@ class WorkoutActivity : AppCompatActivity() {
                 }
             }
             ActivityType.REST -> {
-                startNextExercise()
+                startTransition()
             }
         }
     }
@@ -163,6 +163,7 @@ class WorkoutActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.current_activity).text = "Transition"
         tts?.speak(exerciseList[exerciseIndex].name, TextToSpeech.QUEUE_ADD, null)
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
+        currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         currentTimer?.start()
     }
 
@@ -196,7 +197,7 @@ class WorkoutActivity : AppCompatActivity() {
         tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (exercisesSinceRest < restAfter && totalTimeLeft - currentActivityDuration > 0) {
-            currentTimer?.addEvent(exerciseMillis - 10000, speak("Next exercise. $nextExercise"))
+            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. $nextExercise"))
         }
         addCountdown(3)
         currentTimer?.start()
@@ -216,7 +217,7 @@ class WorkoutActivity : AppCompatActivity() {
         tts?.speak("Rest for $restSeconds seconds", TextToSpeech.QUEUE_ADD, null)
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (totalTimeLeft - currentActivityDuration > 0) {
-            currentTimer?.addEvent(restMillis - 10000, speak("Next exercise. $nextExercise"))
+            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. $nextExercise"))
         }
         addCountdown(3)
         currentTimer?.start()

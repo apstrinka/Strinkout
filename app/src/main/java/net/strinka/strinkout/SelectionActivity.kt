@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ListView
 import android.widget.TextView
 
 const val MESSAGE_WORKOUT = "net.strinka.strinkout.MESSAGE_WORKOUT"
@@ -18,6 +20,9 @@ class SelectionActivity : AppCompatActivity() {
         setContentView(R.layout.activity_selection)
         workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
         findViewById<TextView>(R.id.selected_workout).text = defaultWorkouts[workoutIndex].name
+        val listView = findViewById<ListView>(R.id.activity_selection_list)
+        val array = defaultWorkouts[workoutIndex].exercises.map { i -> i.name }.toTypedArray()
+        listView.adapter = ArrayAdapter<String>(this, R.layout.array_adapter_test, array)
     }
 
     fun beginWorkout(view: View) {

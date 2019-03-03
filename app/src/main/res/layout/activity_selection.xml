@@ -12,26 +12,28 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Selected Workout"
-            android:textColor="#000"
-            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/selected_workout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:textColor="#000"
             android:textSize="20sp" />
+
+        <ListView
+            android:id="@+id/activity_selection_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="How many minutes?"
             android:textColor="#000"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:layout_weight="0"/>
 
         <EditText
             android:id="@+id/select_time"
@@ -39,13 +41,15 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:inputType="number"
-            android:text="15" />
+            android:text="15"
+            android:layout_weight="0"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="beginWorkout"
-            android:text="Begin" />
+            android:text="Begin"
+            android:layout_weight="0"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
