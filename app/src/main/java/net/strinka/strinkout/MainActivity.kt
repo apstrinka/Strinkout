@@ -59,6 +59,14 @@ class MainActivity : AppCompatActivity() {
         selectWorkout(2)
     }
 
+    fun selectNoJumps(view: View){
+        selectWorkout(3)
+    }
+
+    fun selectTest(view: View){
+        selectWorkout(4)
+    }
+
     private fun selectWorkout(workoutIndex: Int) {
         val intent = Intent(this, SelectionActivity::class.java).apply {
             putExtra(MESSAGE_WORKOUT, workoutIndex)

@@ -51,6 +51,18 @@
             android:onClick="selectAdvanced"
             android:text="Advanced" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="selectNoJumps"
+            android:text="Standard w/o Jumps" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="selectTest"
+            android:text="Test" />
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
