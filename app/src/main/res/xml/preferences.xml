@@ -35,5 +35,9 @@
         android:dependency="has_rests"
         android:title="Rests count against total time"
         android:defaultValue="false"/>
+    <SwitchPreferenceCompat
+        android:key="shuffle_exercises"
+        android:title="Shuffle exercises"
+        android:defaultValue="true"/>
 
 </androidx.preference.PreferenceScreen>

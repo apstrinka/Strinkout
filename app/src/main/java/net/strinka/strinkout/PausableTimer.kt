@@ -76,7 +76,7 @@ class PausableTimer {
         }
     }
 
-    private fun getCurrentElapsed(): Long{
+    fun getCurrentElapsed(): Long{
         if (running)
             return elapsed + SystemClock.elapsedRealtime() - startTime
         else
