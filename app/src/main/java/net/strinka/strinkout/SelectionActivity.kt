@@ -11,6 +11,7 @@ import android.widget.TextView
 
 const val MESSAGE_WORKOUT = "net.strinka.strinkout.MESSAGE_WORKOUT"
 const val MESSAGE_TIME = "net.strinka.strinkout.MESSAGE_TIME"
+const val MESSAGE_COMPLETED = "net.strinka.strinkout.MESSAGE_COMPLETED"
 
 class SelectionActivity : AppCompatActivity() {
     var workoutIndex = 0

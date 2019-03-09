@@ -2,6 +2,7 @@ package net.strinka.strinkout
 
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,7 @@ class WorkoutActivity : AppCompatActivity() {
     private var restAfter = 5
     private var restsCount = false
     private var currentTimer: PausableTimer? = null
+    private var totalTime: Long = 0
     private var totalTimeLeft: Long = 0
     private var exerciseIndex = 0
     private var exercisesSinceRest = 0
@@ -66,7 +68,8 @@ class WorkoutActivity : AppCompatActivity() {
         }
         tts = TextToSpeech(this, initListener)
         val message = intent.getStringExtra(MESSAGE_TIME)
-        totalTimeLeft = message.toLong()*60000
+        totalTime = message.toLong()*60000
+        totalTimeLeft = totalTime
         findViewById<TextView>(R.id.total_time_remaing).text = millisToString(totalTimeLeft)
 
         var workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
@@ -110,7 +113,10 @@ class WorkoutActivity : AppCompatActivity() {
 
         val clickListener = object : DialogInterface.OnClickListener{
             override fun onClick(dialogInterface: DialogInterface, which: Int){
-                finishWorkout()
+                if (doesCurrentActivityCount()) {
+                    totalTimeLeft -= currentTimer!!.getCurrentElapsed()
+                }
+                endWorkout()
             }
         }
 
@@ -319,16 +325,13 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun finishWorkout(){
         tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null)
-        findViewById<TextView>(R.id.current_time_remaing).text = millisToString(0)
-        findViewById<TextView>(R.id.current_activity).text = "Congrats!"
-        findViewById<TextView>(R.id.next_exercise).text = "You've Finished!"
-        findViewById<Button>(R.id.start_button).isEnabled = false
-        findViewById<Button>(R.id.pause_button).isEnabled = false
-        findViewById<Button>(R.id.stop_button).isEnabled = false
-        findViewById<Button>(R.id.next_button).isEnabled = false
+        endWorkout()
     }
 
     private fun endWorkout(){
-
+        val intent = Intent(this, FinishActivity::class.java).apply {
+            putExtra(MESSAGE_COMPLETED, (totalTime-totalTimeLeft).toString())
+        }
+        startActivity(intent)
     }
 }
