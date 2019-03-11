@@ -4,7 +4,8 @@
                                                      xmlns:tools="http://schemas.android.com/tools"
                                                      android:layout_width="match_parent"
                                                      android:layout_height="match_parent"
-                                                     tools:context=".MainActivity">
+                                                     tools:context=".MainActivity"
+                                                     android:background="#000">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -30,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Select workout"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp" />
 
         <Button

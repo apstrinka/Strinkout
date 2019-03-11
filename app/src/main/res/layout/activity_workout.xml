@@ -5,7 +5,8 @@
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
                                                    android:keepScreenOn="true"
-                                                   tools:context=".WorkoutActivity">
+                                                   tools:context=".WorkoutActivity"
+                                                   android:background="#000">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Total time left:"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/total_time_remaing"
@@ -32,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Placeholder"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp"
             android:fontFamily="monospace"/>
         <TextView
@@ -40,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Current time left:"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/current_time_remaing"
@@ -48,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Placeholder"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp"
             android:fontFamily="monospace"/>
         <TextView
@@ -56,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Current Activity"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp" />
         <TextView
             android:id="@+id/current_activity"
@@ -64,14 +65,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Press Start to Begin!"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Next exercise"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp" />
         <TextView
             android:id="@+id/next_exercise"
@@ -79,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Placeholder"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="20sp" />
 
         <LinearLayout
