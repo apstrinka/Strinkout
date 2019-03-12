@@ -6,7 +6,7 @@ class Workout {
 
     constructor(name: String, indices: List<Int>){
         this.name = name
-        this.exercises = indices.map { i -> allExercises[i] }
+        this.exercises = indices.map { i -> allExercises[i] }.requireNoNulls()
     }
 }
 

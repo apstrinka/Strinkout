@@ -32,8 +32,8 @@ class WorkoutActivity : AppCompatActivity() {
     private var exercisesSinceRest = 0
     private var currentActivityType = ActivityType.TRANSITION
     private var currentActivityDuration: Long = 0
-    private var currentExercise = Exercise("Test", false)
-    private var nextExercise = Exercise("Test", false)
+    private var currentExercise = Exercise(-1, "Test", false)
+    private var nextExercise = Exercise(-1, "Test", false)
     private var exerciseList: MutableList<Exercise> = arrayListOf()
     private var shuffle = true
 
