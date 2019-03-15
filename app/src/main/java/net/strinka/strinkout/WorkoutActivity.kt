@@ -93,7 +93,12 @@ class WorkoutActivity : AppCompatActivity() {
     fun start(view: View) {
         if (currentTimer == null) {
             tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null)
-            startTransition()
+            currentActivityType = ActivityType.INTRO
+            currentActivityDuration = 2*transitionMillis
+            findViewById<TextView>(R.id.current_activity).text = "Get ready!"
+            tts?.speak(nextExercise.name, TextToSpeech.QUEUE_ADD, null)
+            currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
+            currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         }
         currentTimer?.start()
         findViewById<Button>(R.id.start_button).isEnabled = false
@@ -155,6 +160,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun doesCurrentActivityCount() : Boolean{
         return when (currentActivityType){
+            ActivityType.INTRO -> false
             ActivityType.TRANSITION -> false
             ActivityType.EXERCISE -> true
             ActivityType.REST -> restsCount
@@ -181,7 +187,7 @@ class WorkoutActivity : AppCompatActivity() {
             }
         }
         when(currentActivityType){
-            ActivityType.TRANSITION -> {
+            ActivityType.INTRO, ActivityType.TRANSITION -> {
                 startNextExercise()
             }
             ActivityType.EXERCISE -> {
