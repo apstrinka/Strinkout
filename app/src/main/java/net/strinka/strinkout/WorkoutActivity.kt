@@ -19,6 +19,7 @@ import java.util.*
 class WorkoutActivity : AppCompatActivity() {
     private var tts : TextToSpeech? = null;
     private var exerciseMillis: Long = 30000
+    private var introMillis: Long = 7000
     private var transitionMillis: Long = 5000
     private var hasRests = true
     private var restSeconds: Int = 30
@@ -49,6 +50,7 @@ class WorkoutActivity : AppCompatActivity() {
         var preferences = PreferenceManager.getDefaultSharedPreferences(this)
         exerciseMillis = Math.max(preferences.getInt("exercise_seconds", 30).toLong(), 10)*1000
         transitionMillis = Math.max(preferences.getInt("transition_seconds", 5).toLong(), 1)*1000
+        introMillis = transitionMillis + 2000;
         hasRests = preferences.getBoolean("has_rests", true)
         restSeconds =  Math.max(preferences.getInt("rest_seconds", 30), 5)
         restMillis = restSeconds.toLong()*1000
@@ -71,6 +73,7 @@ class WorkoutActivity : AppCompatActivity() {
         totalTime = message.toLong()*60000
         totalTimeLeft = totalTime
         findViewById<TextView>(R.id.total_time_remaing).text = millisToString(totalTimeLeft)
+        findViewById<TextView>(R.id.current_time_remaing).text = millisToString(introMillis)
 
         var workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
         exerciseList = defaultWorkouts[workoutIndex].exercises.toMutableList()
@@ -94,10 +97,10 @@ class WorkoutActivity : AppCompatActivity() {
         if (currentTimer == null) {
             tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null)
             currentActivityType = ActivityType.INTRO
-            currentActivityDuration = 2*transitionMillis
+            currentActivityDuration = transitionMillis + 2000
             findViewById<TextView>(R.id.current_activity).text = "Get ready!"
-            tts?.speak(nextExercise.name, TextToSpeech.QUEUE_ADD, null)
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
+            currentTimer?.addEvent(2000, speak(nextExercise.name))
             currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         }
         currentTimer?.start()
