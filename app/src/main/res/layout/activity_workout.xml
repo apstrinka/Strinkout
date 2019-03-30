@@ -32,10 +32,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Placeholder"
+            android:text="15:00.00"
             android:textColor="#fff"
             android:textSize="20sp"
             android:fontFamily="monospace"/>
+
+        <ProgressBar
+            android:id="@+id/total_time_progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="1000"
+            android:progress="0"
+            android:progressTint="@color/colorRed"
+            android:progressBackgroundTint="@color/colorBlue"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,10 +58,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Placeholder"
+            android:text="7.00"
             android:textColor="#fff"
             android:textSize="20sp"
             android:fontFamily="monospace"/>
+        <ProgressBar
+            android:id="@+id/current_time_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:max="1000"
+            android:progress="0"
+            android:progressTint="@color/colorRed"
+            android:progressBackgroundTint="@color/colorBlue"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
