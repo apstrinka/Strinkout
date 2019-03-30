@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -263,51 +265,36 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun startNextExercise(){
-        if (nextExercise.sided){
-            currentActivityType = ActivityType.EXERCISE
-            currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)/2
-            currentExercise = nextExercise
-            updateNextExercise()
-            exercisesSinceRest += 1
+        //TODO USe minimum API 21
+        //findViewById<ProgressBar>(R.id.current_time_remaing).progressTintList = ColorStateList.valueOf(Color.rgb(255,0,0))
+        currentActivityType = ActivityType.EXERCISE
+        currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)
+        currentExercise = nextExercise
+        updateNextExercise()
+        exercisesSinceRest += 1
+        findViewById<TextView>(R.id.current_activity).text = currentExercise.name
 
-            findViewById<TextView>(R.id.current_activity).text = currentExercise.name
-
-            if (totalTimeLeft - currentActivityDuration <= 0) {
-                findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
-            } else if (exercisesSinceRest >= restAfter) {
-                findViewById<TextView>(R.id.next_exercise).text = "Rest"
-            } else {
-                findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
-            }
-
-            tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
-            currentTimer = PausableTimer(30, currentActivityDuration, onTick, switchSideTransition)
-            currentTimer?.start()
+        if (totalTimeLeft - currentActivityDuration <= 0) {
+            findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
+        } else if (exercisesSinceRest >= restAfter) {
+            findViewById<TextView>(R.id.next_exercise).text = "Rest"
         } else {
-            currentActivityType = ActivityType.EXERCISE
-            currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)
-            currentExercise = nextExercise
-            updateNextExercise()
-            exercisesSinceRest += 1
+            findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
+        }
 
-            findViewById<TextView>(R.id.current_activity).text = currentExercise.name
+        tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
 
-            if (totalTimeLeft - currentActivityDuration <= 0) {
-                findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
-            } else if (exercisesSinceRest >= restAfter) {
-                findViewById<TextView>(R.id.next_exercise).text = "Rest"
-            } else {
-                findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
-            }
-
-            tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
+        if (nextExercise.sided){
+            currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)/2
+            currentTimer = PausableTimer(30, currentActivityDuration, onTick, switchSideTransition)
+        } else {
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
             if (exercisesSinceRest < restAfter && totalTimeLeft - currentActivityDuration > 0) {
                 currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${nextExercise.name}"))
             }
             addCountdown(3)
-            currentTimer?.start()
         }
+        currentTimer?.start()
     }
 
     private fun startRest(){
