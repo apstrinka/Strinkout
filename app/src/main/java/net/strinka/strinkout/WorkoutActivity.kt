@@ -14,6 +14,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.core.content.ContextCompat
 import java.util.*
 
 class WorkoutActivity : AppCompatActivity() {
@@ -95,7 +96,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun start(view: View) {
         if (currentTimer == null) {
-            tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null)
+            tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null, "")
             currentActivityType = ActivityType.INTRO
             currentActivityDuration = transitionMillis + 2000
             findViewById<TextView>(R.id.current_activity).text = "Get ready!"
@@ -149,6 +150,7 @@ class WorkoutActivity : AppCompatActivity() {
         }
 
         startTransition()
+        findViewById<ProgressBar>(R.id.current_time_progress).progressBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorBlack))
     }
 
     private fun millisToString(millis: Long) : String{
@@ -174,6 +176,11 @@ class WorkoutActivity : AppCompatActivity() {
     private val onTick = fun(millisElapsed: Long){
         var millisLeft = currentActivityDuration - millisElapsed
         updateCurrentTime(millisLeft);
+        if (currentActivityType == ActivityType.INTRO){
+            var totalTimeProgressBar = findViewById<ProgressBar>(R.id.total_time_progress)
+            var currentTimeProgressBar = findViewById<ProgressBar>(R.id.current_time_progress)
+            totalTimeProgressBar.progress = currentTimeProgressBar.progress
+        }
         if (doesCurrentActivityCount()){
             var totalMillisLeft = totalTimeLeft - millisElapsed
             updateTotalTime(totalMillisLeft);
@@ -190,7 +197,11 @@ class WorkoutActivity : AppCompatActivity() {
             }
         }
         when(currentActivityType){
-            ActivityType.INTRO, ActivityType.TRANSITION -> {
+            ActivityType.INTRO -> {
+                updateTotalTimeColor(R.color.colorRed)
+                startNextExercise()
+            }
+            ActivityType.TRANSITION -> {
                 startNextExercise()
             }
             ActivityType.EXERCISE -> {
@@ -207,22 +218,24 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private val switchSideTransition = fun(){
+        updateCurrentTimeColor(R.color.colorBlue)
         totalTimeLeft -= currentActivityDuration
         updateTotalTime(totalTimeLeft);
         currentActivityType = ActivityType.TRANSITION
         currentActivityDuration = transitionMillis
         findViewById<TextView>(R.id.current_activity).text = "Switch sides"
-        tts?.speak("Switch sides", TextToSpeech.QUEUE_ADD, null)
+        tts?.speak("Switch sides", TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, switchSideExercise)
         currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         currentTimer?.start()
     }
 
     private val switchSideExercise = fun(){
+        updateCurrentTimeColor(R.color.colorRed)
         currentActivityType = ActivityType.EXERCISE
         currentActivityDuration = Math.min(exerciseMillis/2, totalTimeLeft)
         findViewById<TextView>(R.id.current_activity).text = currentExercise.name
-        tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
+        tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (exercisesSinceRest < restAfter && totalTimeLeft - currentActivityDuration > 0) {
             currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${nextExercise.name}"))
@@ -233,7 +246,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun speak(text: String): () -> Unit{
         return {
-            tts?.speak(text, TextToSpeech.QUEUE_ADD, null)
+            tts?.speak(text, TextToSpeech.QUEUE_ADD, null, "")
         }
     }
 
@@ -244,10 +257,12 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun startTransition(){
+        updateCurrentTimeColor(R.color.colorBlue)
+
         currentActivityType = ActivityType.TRANSITION
         currentActivityDuration = transitionMillis
         findViewById<TextView>(R.id.current_activity).text = "Transition"
-        tts?.speak(nextExercise.name, TextToSpeech.QUEUE_ADD, null)
+        tts?.speak(nextExercise.name, TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         currentTimer?.start()
@@ -265,8 +280,8 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun startNextExercise(){
-        //TODO USe minimum API 21
-        //findViewById<ProgressBar>(R.id.current_time_remaing).progressTintList = ColorStateList.valueOf(Color.rgb(255,0,0))
+        updateCurrentTimeColor(R.color.colorRed)
+
         currentActivityType = ActivityType.EXERCISE
         currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)
         currentExercise = nextExercise
@@ -282,9 +297,9 @@ class WorkoutActivity : AppCompatActivity() {
             findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
         }
 
-        tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null)
+        tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null, "")
 
-        if (nextExercise.sided){
+        if (currentExercise.sided){
             currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)/2
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, switchSideTransition)
         } else {
@@ -298,6 +313,8 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun startRest(){
+        updateCurrentTimeColor(R.color.colorBlack)
+
         currentActivityType = ActivityType.REST
         currentActivityDuration = restMillis
         findViewById<TextView>(R.id.current_activity).text = "Rest"
@@ -308,7 +325,7 @@ class WorkoutActivity : AppCompatActivity() {
         }
 
         exercisesSinceRest = 0
-        tts?.speak("Rest for $restSeconds seconds", TextToSpeech.QUEUE_ADD, null)
+        tts?.speak("Rest for $restSeconds seconds", TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (totalTimeLeft - currentActivityDuration > 0) {
             currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. $nextExercise"))
@@ -318,7 +335,7 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun finishWorkout(){
-        tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null)
+        tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null, "")
         endWorkout()
     }
 
@@ -340,8 +357,21 @@ class WorkoutActivity : AppCompatActivity() {
             findViewById<ProgressBar>(R.id.current_time_progress).progress = 0;
         else {
             val progress = ((currentActivityDuration - millisLeft)*1000 / currentActivityDuration).toInt()
-            findViewById<ProgressBar>(R.id.current_time_progress).progress = progress;
-                    ;
+            findViewById<ProgressBar>(R.id.current_time_progress).progress = progress
         }
+    }
+
+    private fun updateTotalTimeColor(colorId: Int){
+        var totalTimeProgressBar = findViewById<ProgressBar>(R.id.total_time_progress)
+        totalTimeProgressBar.progress = 0
+        totalTimeProgressBar.progressBackgroundTintList = totalTimeProgressBar.progressTintList
+        totalTimeProgressBar.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(this, colorId))
+    }
+
+    private fun updateCurrentTimeColor(colorId: Int){
+        var currentTimeProgressBar = findViewById<ProgressBar>(R.id.current_time_progress)
+        currentTimeProgressBar.progress = 0
+        currentTimeProgressBar.progressBackgroundTintList = currentTimeProgressBar.progressTintList
+        currentTimeProgressBar.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(this, colorId))
     }
 }
