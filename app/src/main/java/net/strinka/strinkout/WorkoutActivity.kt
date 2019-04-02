@@ -3,9 +3,7 @@ package net.strinka.strinkout
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -30,14 +28,11 @@ class WorkoutActivity : AppCompatActivity() {
     private var currentTimer: PausableTimer? = null
     private var totalTime: Long = 0
     private var totalTimeLeft: Long = 0
-    private var exerciseIndex = 0
+    private var timeSpentWorkingOut: Long = 0
     private var exercisesSinceRest = 0
     private var currentActivityType = ActivityType.TRANSITION
     private var currentActivityDuration: Long = 0
-    private var currentExercise = Exercise(-1, "Test", false)
-    private var nextExercise = Exercise(-1, "Test", false)
-    private var exerciseList: MutableList<Exercise> = arrayListOf()
-    private var shuffle = true
+    private var exerciseList: ExerciseList = ExerciseList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +43,7 @@ class WorkoutActivity : AppCompatActivity() {
         val frameAnimation = imageView.background as AnimationDrawable
         frameAnimation.start()
 
-        var preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         exerciseMillis = Math.max(preferences.getInt("exercise_seconds", 30).toLong(), 10)*1000
         transitionMillis = Math.max(preferences.getInt("transition_seconds", 5).toLong(), 1)*1000
         introMillis = transitionMillis + 2000;
@@ -59,7 +54,7 @@ class WorkoutActivity : AppCompatActivity() {
         restsCount = preferences.getBoolean("rests_count", false)
         if (!hasRests)
             restAfter = Int.MAX_VALUE
-        shuffle = preferences.getBoolean("shuffle_exercises", true)
+        val shuffle = preferences.getBoolean("shuffle_exercises", true)
 
         val initListener = TextToSpeech.OnInitListener {
             fun onInit(status: Int) {
@@ -76,17 +71,9 @@ class WorkoutActivity : AppCompatActivity() {
         updateTotalTime(totalTimeLeft);
         updateCurrentTime(introMillis);
 
-        var workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
-        exerciseList = defaultWorkouts[workoutIndex].exercises.toMutableList()
-        if (shuffle) {
-            exerciseList.shuffle()
-        }
-        exerciseIndex = 0
-        exercisesSinceRest = 0
-        currentActivityType = ActivityType.TRANSITION
-        nextExercise = exerciseList[0]
-        findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
-
+        val workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
+        exerciseList = ExerciseList(defaultWorkouts[workoutIndex], shuffle)
+        findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
     }
 
     override fun onStop() {
@@ -101,7 +88,7 @@ class WorkoutActivity : AppCompatActivity() {
             currentActivityDuration = transitionMillis + 2000
             findViewById<TextView>(R.id.current_activity).text = "Get ready!"
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
-            currentTimer?.addEvent(2000, speak(nextExercise.name))
+            currentTimer?.addEvent(2000, speak(exerciseList.nextExercise.name))
             currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         }
         currentTimer?.start()
@@ -120,18 +107,16 @@ class WorkoutActivity : AppCompatActivity() {
     fun stop(view: View){
         pause(view)
 
-        val clickListener = object : DialogInterface.OnClickListener{
-            override fun onClick(dialogInterface: DialogInterface, which: Int){
-                if (doesCurrentActivityCount()) {
-                    totalTimeLeft -= currentTimer!!.getCurrentElapsed()
-                }
-                endWorkout()
+        val yesClickListener = DialogInterface.OnClickListener { dialogInterface, which ->
+            if (currentActivityType == ActivityType.EXERCISE) {
+                timeSpentWorkingOut += currentTimer!!.getCurrentElapsed()
             }
+            endWorkout()
         }
 
         AlertDialog.Builder(this)
             .setMessage("Are you sure you want to stop?")
-            .setPositiveButton("Yes", clickListener)
+            .setPositiveButton("Yes", yesClickListener)
             .setNegativeButton("No", null)
             .show()
     }
@@ -139,14 +124,19 @@ class WorkoutActivity : AppCompatActivity() {
     fun next(view: View){
         currentTimer!!.pause()
         val elapsed = currentTimer!!.getCurrentElapsed()
+
+        if (currentActivityType == ActivityType.EXERCISE){
+            timeSpentWorkingOut += elapsed
+        }
+
         if (doesCurrentActivityCount()){
             totalTimeLeft -= elapsed
             updateTotalTime(totalTimeLeft);
         }
 
         if (currentActivityType == ActivityType.TRANSITION){
-            updateNextExercise()
-            findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
+            exerciseList.moveNext()
+            findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
         }
 
         startTransition()
@@ -188,6 +178,10 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private val onFinish = fun(){
+        if (currentActivityType == ActivityType.EXERCISE){
+            timeSpentWorkingOut += currentActivityDuration
+        }
+
         if (doesCurrentActivityCount()){
             totalTimeLeft -= currentActivityDuration
             updateTotalTime(totalTimeLeft);
@@ -234,11 +228,11 @@ class WorkoutActivity : AppCompatActivity() {
         updateCurrentTimeColor(R.color.colorRed)
         currentActivityType = ActivityType.EXERCISE
         currentActivityDuration = Math.min(exerciseMillis/2, totalTimeLeft)
-        findViewById<TextView>(R.id.current_activity).text = currentExercise.name
+        findViewById<TextView>(R.id.current_activity).text = exerciseList.currentExercise.name
         tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (exercisesSinceRest < restAfter && totalTimeLeft - currentActivityDuration > 0) {
-            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${nextExercise.name}"))
+            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${exerciseList.nextExercise.name}"))
         }
         addCountdown(3)
         currentTimer?.start()
@@ -262,21 +256,10 @@ class WorkoutActivity : AppCompatActivity() {
         currentActivityType = ActivityType.TRANSITION
         currentActivityDuration = transitionMillis
         findViewById<TextView>(R.id.current_activity).text = "Transition"
-        tts?.speak(nextExercise.name, TextToSpeech.QUEUE_ADD, null, "")
+        tts?.speak(exerciseList.nextExercise.name, TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         currentTimer?.addEvent(currentActivityDuration - 1000, speak("Ready"))
         currentTimer?.start()
-    }
-
-    private fun updateNextExercise(){
-        exerciseIndex += 1
-        if (exerciseIndex >= exerciseList.size){
-            exerciseIndex = 0
-            if (shuffle) {
-                exerciseList.shuffle()
-            }
-        }
-        nextExercise = exerciseList[exerciseIndex]
     }
 
     private fun startNextExercise(){
@@ -284,28 +267,27 @@ class WorkoutActivity : AppCompatActivity() {
 
         currentActivityType = ActivityType.EXERCISE
         currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)
-        currentExercise = nextExercise
-        updateNextExercise()
+        exerciseList.moveNext()
         exercisesSinceRest += 1
-        findViewById<TextView>(R.id.current_activity).text = currentExercise.name
+        findViewById<TextView>(R.id.current_activity).text = exerciseList.currentExercise.name
 
         if (totalTimeLeft - currentActivityDuration <= 0) {
             findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
         } else if (exercisesSinceRest >= restAfter) {
             findViewById<TextView>(R.id.next_exercise).text = "Rest"
         } else {
-            findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
+            findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
         }
 
         tts?.speak("Begin", TextToSpeech.QUEUE_ADD, null, "")
 
-        if (currentExercise.sided){
+        if (exerciseList.currentExercise.sided){
             currentActivityDuration = Math.min(exerciseMillis, totalTimeLeft)/2
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, switchSideTransition)
         } else {
             currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
             if (exercisesSinceRest < restAfter && totalTimeLeft - currentActivityDuration > 0) {
-                currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${nextExercise.name}"))
+                currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${exerciseList.nextExercise.name}"))
             }
             addCountdown(3)
         }
@@ -318,32 +300,23 @@ class WorkoutActivity : AppCompatActivity() {
         currentActivityType = ActivityType.REST
         currentActivityDuration = restMillis
         findViewById<TextView>(R.id.current_activity).text = "Rest"
-        findViewById<TextView>(R.id.next_exercise).text = nextExercise.name
+        findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
+
         if (restsCount && totalTimeLeft <= restMillis){
-            currentActivityDuration = totalTimeLeft
-            findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
+            //currentActivityDuration = totalTimeLeft
+            //findViewById<TextView>(R.id.next_exercise).text = "Almost done!"
+            finishWorkout()
+            return
         }
 
         exercisesSinceRest = 0
         tts?.speak("Rest for $restSeconds seconds", TextToSpeech.QUEUE_ADD, null, "")
         currentTimer = PausableTimer(30, currentActivityDuration, onTick, onFinish)
         if (totalTimeLeft - currentActivityDuration > 0) {
-            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. $nextExercise"))
+            currentTimer?.addEvent(currentActivityDuration - 10000, speak("Next exercise. ${exerciseList.nextExercise.name}"))
         }
         addCountdown(3)
         currentTimer?.start()
-    }
-
-    private fun finishWorkout(){
-        tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null, "")
-        endWorkout()
-    }
-
-    private fun endWorkout(){
-        val intent = Intent(this, FinishActivity::class.java).apply {
-            putExtra(MESSAGE_COMPLETED, (totalTime-totalTimeLeft).toString())
-        }
-        startActivity(intent)
     }
 
     private fun updateTotalTime(millisLeft: Long){
@@ -373,5 +346,17 @@ class WorkoutActivity : AppCompatActivity() {
         currentTimeProgressBar.progress = 0
         currentTimeProgressBar.progressBackgroundTintList = currentTimeProgressBar.progressTintList
         currentTimeProgressBar.progressTintList = ColorStateList.valueOf(ContextCompat.getColor(this, colorId))
+    }
+
+    private fun finishWorkout(){
+        tts?.speak("Congrats! You've finished!", TextToSpeech.QUEUE_ADD, null, "")
+        endWorkout()
+    }
+
+    private fun endWorkout(){
+        val intent = Intent(this, FinishActivity::class.java).apply {
+            putExtra(MESSAGE_COMPLETED, (timeSpentWorkingOut).toString())
+        }
+        startActivity(intent)
     }
 }
