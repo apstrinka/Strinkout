@@ -213,6 +213,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     private val switchSideTransition = fun(){
         updateCurrentTimeColor(R.color.colorBlue)
+        timeSpentWorkingOut += currentActivityDuration
         totalTimeLeft -= currentActivityDuration
         updateTotalTime(totalTimeLeft);
         currentActivityType = ActivityType.TRANSITION
