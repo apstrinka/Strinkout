@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
+import java.io.File
 import java.util.*
 
 class WorkoutActivity : AppCompatActivity() {
@@ -72,7 +73,9 @@ class WorkoutActivity : AppCompatActivity() {
         updateCurrentTime(introMillis);
 
         val workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
-        exerciseList = ExerciseList(defaultWorkouts[workoutIndex], shuffle)
+        val workout = defaultWorkouts[workoutIndex]
+        title = workout.name
+        exerciseList = ExerciseList(workout, shuffle)
         findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
     }
 
@@ -355,9 +358,23 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun endWorkout(){
+        writeHistory()
+
         val intent = Intent(this, FinishActivity::class.java).apply {
             putExtra(MESSAGE_COMPLETED, (timeSpentWorkingOut).toString())
         }
         startActivity(intent)
+    }
+
+    private fun writeHistory(){
+        val historyFile = File(filesDir, historyFilename)
+        if (!historyFile.exists())
+            historyFile.createNewFile()
+
+        val time = Calendar.getInstance().time
+        val workout = title
+        val duration = timeSpentWorkingOut
+
+        historyFile.appendText("$time, $workout, $duration")
     }
 }

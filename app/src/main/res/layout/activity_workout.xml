@@ -16,9 +16,9 @@
 
         <ImageView
             android:id="@+id/workout_animation"
-            android:layout_width="600px"
-            android:layout_height="600px"
-            android:layout_weight="10"/>
+            android:layout_width="700px"
+            android:layout_height="700px"
+            android:layout_weight="0"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,34 +29,44 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 android:text="Total time left:  "
                 android:textColor="#fff"
-                android:textSize="20sp"/>
+                android:textSize="25sp"/>
 
             <TextView
                 android:id="@+id/total_time_remaing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="15:00.00"
                 android:textColor="#fff"
-                android:textSize="20sp"
+                android:textAlignment="viewEnd"
+                android:textSize="25sp"
                 android:fontFamily="monospace"/>
         </LinearLayout>
 
         <ProgressBar
             android:id="@+id/total_time_progress"
-            style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="2"
+            style="@android:style/Widget.ProgressBar.Horizontal"
             android:max="1000"
             android:progress="0"
             android:progressTint="@color/colorBlue"
             android:progressBackgroundTint="@color/colorBlack"/>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <ProgressBar
             android:id="@+id/current_time_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="2"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:max="1000"
             android:progress="0"
@@ -72,17 +82,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current time left:  "
+                android:layout_weight="0"
+                android:text="Current time left:"
                 android:textColor="#fff"
-                android:textSize="20sp"/>
+                android:textSize="25sp"/>
 
             <TextView
                 android:id="@+id/current_time_remaing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="7.00"
                 android:textColor="#fff"
-                android:textSize="20sp"
+                android:textAlignment="viewEnd"
+                android:textSize="25sp"
                 android:fontFamily="monospace"/>
         </LinearLayout>
 
@@ -95,17 +108,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current Activity:  "
+                android:layout_weight="0"
+                android:text="Current Activity:"
                 android:textColor="#fff"
-                android:textSize="20sp" />
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/current_activity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Press Start to Begin!"
+                android:layout_weight="1"
+                android:text="Press Start!"
                 android:textColor="#fff"
-                android:textSize="20sp" />
+                android:textAlignment="viewEnd"
+                android:textSize="25sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -117,17 +133,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 android:text="Next exercise:  "
                 android:textColor="#fff"
-                android:textSize="20sp" />
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/next_exercise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Placeholder"
                 android:textColor="#fff"
-                android:textSize="20sp" />
+                android:textAlignment="viewEnd"
+                android:textSize="25sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -140,6 +159,7 @@
                 android:id="@+id/start_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="start"
                 android:text="Start" />
 
@@ -147,6 +167,7 @@
                 android:id="@+id/pause_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="pause"
                 android:text="Pause"
                 android:enabled="false"/>
@@ -155,6 +176,7 @@
                 android:id="@+id/stop_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="stop"
                 android:text="Stop"
                 android:enabled="false"/>
@@ -163,6 +185,7 @@
                 android:id="@+id/next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:onClick="next"
                 android:text="Next"
                 android:enabled="false"/>

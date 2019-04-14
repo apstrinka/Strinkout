@@ -36,13 +36,20 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> selectSettingsItem()
+            R.id.menu_settings -> selectSettingsItem()
+            R.id.menu_history -> selectHistoryItem()
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     fun selectSettingsItem(): Boolean{
         val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent);
+        return true
+    }
+
+    fun selectHistoryItem(): Boolean{
+        val intent = Intent(this, HistoryActivity::class.java)
         startActivity(intent);
         return true
     }

@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Strinkout</string>
-    <string name="action_settings">Settings</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_history">History</string>
 </resources>
