@@ -109,20 +109,18 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun stop(view: View){
         pause(view)
-
-        val yesClickListener = DialogInterface.OnClickListener { dialogInterface, which ->
+        
+        val onYes = fun(){
             if (currentActivityType == ActivityType.EXERCISE) {
                 timeSpentWorkingOut += currentTimer!!.getCurrentElapsed()
             }
             endWorkout()
         }
 
-        AlertDialog.Builder(this)
-            .setMessage("Are you sure you want to stop?")
-            .setPositiveButton("Yes", yesClickListener)
-            .setNegativeButton("No", null)
-            .show()
+        showConfirmDialog(this, "Are you sure you want to stop?", onYes)
     }
+
+
 
     fun next(view: View){
         currentTimer!!.pause()

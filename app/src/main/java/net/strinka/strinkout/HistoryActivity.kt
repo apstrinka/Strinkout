@@ -45,18 +45,10 @@ class HistoryActivity : AppCompatActivity() {
     }
 
     fun clearHistoryButton(view: View){
-        val yesClickListener = DialogInterface.OnClickListener { dialogInterface, which ->
-            clearHistory()
-        }
-
-        AlertDialog.Builder(this)
-            .setMessage("Are you sure you want to delete your workout history?")
-            .setPositiveButton("Yes", yesClickListener)
-            .setNegativeButton("No", null)
-            .show()
+        showConfirmDialog(this, "Are you sure you want to delete your workout history?", clearHistory)
     }
 
-    private fun clearHistory(){
+    private val clearHistory = fun(){
         val file = File(filesDir, historyFilename)
         file.delete()
         updateHistory()
