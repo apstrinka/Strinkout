@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         selectWorkout(2)
     }
 
-    fun selectNoJumps(view: View){
+    fun selectQuiet(view: View){
         selectWorkout(3)
     }
 

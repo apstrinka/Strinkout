@@ -86,7 +86,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun start(view: View) {
         if (currentTimer == null) {
-            tts?.speak("Welcome back.", TextToSpeech.QUEUE_ADD, null, "")
+            tts?.speak("Let's have a great workout.", TextToSpeech.QUEUE_ADD, null, "")
             currentActivityType = ActivityType.INTRO
             currentActivityDuration = transitionMillis + 2000
             findViewById<TextView>(R.id.current_activity).text = "Get ready!"
@@ -109,7 +109,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun stop(view: View){
         pause(view)
-        
+
         val onYes = fun(){
             if (currentActivityType == ActivityType.EXERCISE) {
                 timeSpentWorkingOut += currentTimer!!.getCurrentElapsed()
@@ -119,8 +119,6 @@ class WorkoutActivity : AppCompatActivity() {
 
         showConfirmDialog(this, "Are you sure you want to stop?", onYes)
     }
-
-
 
     fun next(view: View){
         currentTimer!!.pause()
@@ -142,16 +140,6 @@ class WorkoutActivity : AppCompatActivity() {
 
         startTransition()
         findViewById<ProgressBar>(R.id.current_time_progress).progressBackgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorBlack))
-    }
-
-    private fun millisToString(millis: Long) : String{
-        val min = millis / 60000
-        val sec = (millis % 60000) / 1000
-        val cen = (millis % 1000) / 10
-        if (min > 0)
-            return "$min:${sec.toString().padStart(2, '0')}.${cen.toString().padStart(2, '0')}"
-        else
-            return "$sec.${cen.toString().padStart(2, '0')}"
     }
 
     private fun doesCurrentActivityCount() : Boolean{
@@ -365,14 +353,16 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun writeHistory(){
-        val historyFile = File(filesDir, historyFilename)
-        if (!historyFile.exists())
-            historyFile.createNewFile()
+        if (timeSpentWorkingOut > 1000) {
+            val historyFile = File(filesDir, historyFilename)
+            if (!historyFile.exists())
+                historyFile.createNewFile()
 
-        val time = Calendar.getInstance().time
-        val workout = title
-        val duration = timeSpentWorkingOut
+            val time = Calendar.getInstance().timeInMillis
+            val workout = title
+            val duration = timeSpentWorkingOut
 
-        historyFile.appendText("$time, $workout, $duration")
+            historyFile.appendText("$time,$duration,$workout\n")
+        }
     }
 }
