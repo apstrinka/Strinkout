@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Total time left:  "
-                android:textColor="#fff"
+                android:textColor="#ccc"
                 android:textSize="25sp"/>
 
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="15:00.00"
-                android:textColor="#fff"
+                android:textColor="#ccc"
                 android:textAlignment="viewEnd"
                 android:textSize="25sp"
                 android:fontFamily="monospace"/>
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Current time left:"
-                android:textColor="#fff"
+                android:textColor="#ccc"
                 android:textSize="25sp"/>
 
             <TextView
@@ -93,36 +93,21 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="7.00"
-                android:textColor="#fff"
+                android:textColor="#ccc"
                 android:textAlignment="viewEnd"
                 android:textSize="25sp"
                 android:fontFamily="monospace"/>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/current_activity"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text="Current Activity:"
-                android:textColor="#fff"
-                android:textSize="25sp" />
-
-            <TextView
-                android:id="@+id/current_activity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Press Start!"
-                android:textColor="#fff"
-                android:textAlignment="viewEnd"
-                android:textSize="25sp" />
-        </LinearLayout>
+            android:text="Press Start!"
+            android:textColor="#fff"
+            android:textAlignment="viewEnd"
+            android:textSize="35sp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -134,9 +119,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:text="Next exercise:  "
-                android:textColor="#fff"
-                android:textSize="25sp" />
+                android:text="Next: "
+                android:textColor="#ccc"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/next_exercise"
@@ -144,9 +129,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Placeholder"
-                android:textColor="#fff"
+                android:textColor="#ccc"
                 android:textAlignment="viewEnd"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout

@@ -344,25 +344,11 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun endWorkout(){
-        writeHistory()
+        writeHistory(filesDir, title, timeSpentWorkingOut)
 
         val intent = Intent(this, FinishActivity::class.java).apply {
             putExtra(MESSAGE_COMPLETED, (timeSpentWorkingOut).toString())
         }
         startActivity(intent)
-    }
-
-    private fun writeHistory(){
-        if (timeSpentWorkingOut > 1000) {
-            val historyFile = File(filesDir, historyFilename)
-            if (!historyFile.exists())
-                historyFile.createNewFile()
-
-            val time = Calendar.getInstance().timeInMillis
-            val workout = title
-            val duration = timeSpentWorkingOut
-
-            historyFile.appendText("$time,$duration,$workout\n")
-        }
     }
 }

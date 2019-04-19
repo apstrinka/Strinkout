@@ -2,13 +2,13 @@ package net.strinka.strinkout
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File
 import java.util.*
-
-val historyFilename = "WorkoutHistory.csv"
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -21,30 +21,8 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun updateHistory(){
         val listView = findViewById<ListView>(R.id.activity_history_list)
-        val array = getRecords()
+        val array = getRecords(filesDir)
         listView.adapter = HistoryAdapter(this, R.layout.array_adapter_test, array)
-    }
-
-    private fun getRecords(): List<List<String>>{
-        val file = File(filesDir, historyFilename)
-        if (!file.exists())
-            return listOf(listOf("No workouts recorded"))
-
-        val lines = file.bufferedReader().readLines()
-        if (lines.isEmpty())
-            return listOf(listOf("No workouts recorded"))
-        return lines.map{getRecord(it)}
-    }
-
-    private fun getRecord(str: String): List<String>{
-        val split = str.split(',', limit = 3)
-        val calendarTime = split[0].toLong()
-        val calendar = Calendar.getInstance()
-        calendar.timeInMillis = calendarTime
-        val calendarString = "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
-        val durationTime = split[1].toLong()
-        val durationString = millisToString(durationTime)
-        return listOf(calendarString, split[2], durationString)
     }
 
     fun clearHistoryButton(view: View){
@@ -57,11 +35,26 @@ class HistoryActivity : AppCompatActivity() {
         updateHistory()
     }
 
-    public fun testButton(view: View){
+    fun testButton(view: View){
         val file = File(filesDir, historyFilename)
         if (!file.exists())
             file.createNewFile()
         file.appendText("0,0,Test Name\n")
         updateHistory()
+    }
+
+    fun switchHistoryView(view: View){
+        val button = findViewById<Button>(R.id.switch_history_button)
+        val listView = findViewById<LinearLayout>(R.id.history_list)
+        val graphView = findViewById<GraphView>(R.id.history_graph)
+        if (listView.visibility == View.VISIBLE){
+            button.text = "View as List"
+            listView.visibility = View.GONE
+            graphView.visibility = View.VISIBLE
+        } else {
+            button.text = "View as Graph"
+            listView.visibility = View.VISIBLE
+            graphView.visibility = View.GONE
+        }
     }
 }
