@@ -58,3 +58,7 @@ fun getRecord(str: String): Record{
     val duration = split[1].toLong()
     return Record(calendar, split[2], duration)
 }
+
+fun convertForGraph(records: List<Record>): DoubleArray{
+    return records.map { it.workoutDuration.toDouble() / 60000 }.toDoubleArray()
+}

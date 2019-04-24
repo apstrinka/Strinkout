@@ -1,6 +1,7 @@
 package net.strinka.strinkout
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -21,8 +22,12 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun updateHistory(){
         val listView = findViewById<ListView>(R.id.activity_history_list)
-        val array = getRecords(filesDir)
-        listView.adapter = HistoryAdapter(this, R.layout.array_adapter_test, array)
+        val graphView = findViewById<GraphView>(R.id.history_graph)
+        val records = getRecords(filesDir)
+        listView.adapter = HistoryAdapter(this, R.layout.array_adapter_test, records)
+        val values = convertForGraph(records)
+        Log.d("mytag", "Records ${records.size} ${values.size}")
+        graphView.barValues = values
     }
 
     fun clearHistoryButton(view: View){
