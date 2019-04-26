@@ -23,11 +23,9 @@ class HistoryActivity : AppCompatActivity() {
     private fun updateHistory(){
         val listView = findViewById<ListView>(R.id.activity_history_list)
         val graphView = findViewById<GraphView>(R.id.history_graph)
-        val records = getRecords(filesDir)
-        listView.adapter = HistoryAdapter(this, R.layout.array_adapter_test, records)
-        val values = convertForGraph(records)
-        Log.d("mytag", "Records ${records.size} ${values.size}")
-        graphView.barValues = values
+        val history = History(filesDir)
+        listView.adapter = HistoryAdapter(this, R.layout.array_adapter_test, history.getRecords())
+        graphView.barValues = history.getGraphValues()
     }
 
     fun clearHistoryButton(view: View){
