@@ -18,7 +18,6 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
         val paint = Paint()
         paint.color = Color.BLACK
         can.drawRect(Rect(0, 0, width, height), paint);
-        Log.d("mytag", "${barValues.size} values")
 
         if (barValues.isNotEmpty()) {
 
@@ -35,7 +34,6 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
             paint.color = ContextCompat.getColor(context, R.color.colorBlue)
             val barWidth = width.toDouble() / barValues.size
             barValues.forEachIndexed { index, value ->
-                Log.d("mytag", "$index, $value")
                 val left = (index * barWidth + barWidth/8).toFloat()
                 val right = (index * barWidth + 7*barWidth/8).toFloat()
                 val bottom = height.toFloat()

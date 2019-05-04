@@ -1,5 +1,6 @@
 package net.strinka.strinkout
 
+import android.util.Log
 import java.io.File
 import java.util.*
 
@@ -26,7 +27,7 @@ class Record {
     }
 
     fun calendarString(): String{
-        return "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+        return "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)+1}-${calendar.get(Calendar.DAY_OF_MONTH)}"
     }
 
     fun durationString(): String{
@@ -75,7 +76,29 @@ class History{
 
     fun getGraphValues(): DoubleArray{
         loadRecords()
-        return records.map { it.workoutDuration.toDouble() / 60000 }.toDoubleArray()
+        if (records.isEmpty())
+            return DoubleArray(0)
+        val list: MutableList<Long> = mutableListOf()
+        val minCal = records.map{ it.calendar }.min()!!
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = minCal.timeInMillis
+        val now = Calendar.getInstance()
+
+        while (cal < now || isSameDay(cal, now)){
+            list.add(records.filter{isSameDay(cal, it.calendar)}.map{it.workoutDuration}.sum())
+            cal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        return list.map { it.toDouble() / 60000 }.toDoubleArray()
+    }
+
+    private fun isSameDay(first: Calendar, second: Calendar): Boolean{
+        val firstYear = first.get(Calendar.YEAR)
+        val firstDay = first.get(Calendar.DAY_OF_YEAR)
+        val secondYear = second.get(Calendar.YEAR)
+        val secondDay = second.get(Calendar.DAY_OF_YEAR)
+
+        return firstYear == secondYear && firstDay == secondDay
     }
 }
 
