@@ -84,6 +84,19 @@ class WorkoutActivity : AppCompatActivity() {
         super.onStop()
     }
 
+    override fun onBackPressed(){
+        pause()
+
+        val onYes = fun(){
+            //if (currentActivityType == ActivityType.EXERCISE) {
+            //    timeSpentWorkingOut += currentTimer!!.getCurrentElapsed()
+            //}
+            super.onBackPressed()
+        }
+
+        showConfirmDialog(this, "Are you sure you want to go back?", onYes)
+    }
+
     fun start(view: View) {
         if (currentTimer == null) {
             tts?.speak("Let's have a great workout.", TextToSpeech.QUEUE_ADD, null, "")
@@ -101,14 +114,18 @@ class WorkoutActivity : AppCompatActivity() {
         findViewById<Button>(R.id.next_button).isEnabled = true
     }
 
-    fun pause(view: View){
+    fun pauseButton(view: View){
+        pause()
+    }
+
+    fun pause(){
         currentTimer?.pause()
         findViewById<Button>(R.id.start_button).isEnabled = true
         findViewById<Button>(R.id.pause_button).isEnabled = false
     }
 
     fun stop(view: View){
-        pause(view)
+        pause()
 
         val onYes = fun(){
             if (currentActivityType == ActivityType.EXERCISE) {
@@ -136,6 +153,12 @@ class WorkoutActivity : AppCompatActivity() {
         if (currentActivityType == ActivityType.TRANSITION){
             exerciseList.moveNext()
             findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
+        }
+
+        if (currentActivityType == ActivityType.INTRO){
+            exerciseList.moveNext()
+            findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
+            updateTotalTimeColor(R.color.colorRed)
         }
 
         startTransition()
