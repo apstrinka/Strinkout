@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Total time left:  "
-                android:textColor="#ccc"
+                android:textColor="#ddd"
                 android:textSize="25sp"/>
 
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="15:00.00"
-                android:textColor="#ccc"
+                android:textColor="#ddd"
                 android:textAlignment="viewEnd"
                 android:textSize="25sp"
                 android:fontFamily="monospace"/>
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Current time left:"
-                android:textColor="#ccc"
+                android:textColor="#ddd"
                 android:textSize="25sp"/>
 
             <TextView
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="7.00"
-                android:textColor="#ccc"
+                android:textColor="#ddd"
                 android:textAlignment="viewEnd"
                 android:textSize="25sp"
                 android:fontFamily="monospace"/>
@@ -120,8 +120,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:text="Next: "
-                android:textColor="#ccc"
-                android:textSize="20sp" />
+                android:textColor="#ddd"
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/next_exercise"
@@ -129,9 +129,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Placeholder"
-                android:textColor="#ccc"
+                android:textColor="#ddd"
                 android:textAlignment="viewEnd"
-                android:textSize="20sp" />
+                android:textSize="25sp" />
         </LinearLayout>
 
         <LinearLayout

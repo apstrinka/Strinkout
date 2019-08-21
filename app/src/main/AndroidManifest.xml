@@ -9,6 +9,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".NewCustomWorkout"
+            android:label="New Custom Workout"
+            android:parentActivityName=".CustomWorkouts">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.CustomWorkouts" />
+        </activity>
+        <activity android:name=".CustomWorkouts"
+            android:label="Custom Workouts"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.MainActivity" />
+        </activity>
         <activity
             android:name=".HistoryActivity"
             android:label="Workout History"

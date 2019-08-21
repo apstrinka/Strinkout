@@ -70,8 +70,9 @@ class MainActivity : AppCompatActivity() {
         selectWorkout(3)
     }
 
-    fun selectTest(view: View){
-        selectWorkout(4)
+    fun customWorkoutsButton(view: View){
+        val intent = Intent(this, CustomWorkouts::class.java)
+        startActivity(intent)
     }
 
     private fun selectWorkout(workoutIndex: Int) {
