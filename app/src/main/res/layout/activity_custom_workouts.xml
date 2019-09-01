@@ -13,12 +13,27 @@
         android:layout_gravity="center"
         android:layout_weight="0"
         android:text="Create New Custom Workout"
-        android:onClick="newCustomWorkoutsButton" />
+        android:onClick="newCustomWorkoutButton" />
 
-    <ListView
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="0"
+        android:text="Delete Selected Workout"
+        android:onClick="removeSelectedWorkoutButton" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/custom_workouts_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        tools:listitem="@layout/recyclerview_item"/>
+
+    <!--<ListView
         android:id="@+id/custom_workouts_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1" />-->
 
 </LinearLayout>
