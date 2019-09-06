@@ -21,6 +21,13 @@ class CustomWorkoutViewModel(application: Application) : AndroidViewModel(applic
         repository.insert(name)
     }
 
+    fun moveItem(from: Int, to: Int) = viewModelScope.launch(Dispatchers.IO) {
+        val workoutFrom = allCustomWorkouts.value!![from]
+        val workoutTo = allCustomWorkouts.value!![to]
+        val toOrdinal = workoutTo.ordinal
+        repository.move(workoutFrom, toOrdinal)
+    }
+
     fun update(customWorkout: CustomWorkout) = viewModelScope.launch(Dispatchers.IO) {
         repository.update(customWorkout)
     }

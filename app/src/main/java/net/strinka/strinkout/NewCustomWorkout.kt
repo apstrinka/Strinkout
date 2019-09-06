@@ -16,13 +16,6 @@ class NewCustomWorkout : AppCompatActivity() {
     }
 
     fun finishButton(view: View){
-//        val name = findViewById<EditText>(R.id.new_workout_name).text.toString();
-//        val newWorkout = Workout(name, emptyList())
-//        writeCustomWorkout(filesDir, newWorkout)
-//
-//        val intent = Intent(this, CustomWorkouts::class.java)
-//        startActivity(intent)
-
         val textView = findViewById<EditText>(R.id.new_workout_name)
         val replyIntent = Intent()
         if (TextUtils.isEmpty(textView.text)){

@@ -9,7 +9,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class StringListAdapter internal constructor(context: Context) : RecyclerView.Adapter<StringListAdapter.ViewHolder>() {
+class StringListAdapter internal constructor(context: Context, recyclerView: RecyclerView) : RecyclerView.Adapter<StringListAdapter.ViewHolder>() {
+    private val recyclerView = recyclerView
     private val inflater = LayoutInflater.from(context)
     private var strings = emptyList<String>()
     var selectedItem = -1
@@ -44,18 +45,31 @@ class StringListAdapter internal constructor(context: Context) : RecyclerView.Ad
     }
 
     internal fun setStrings(strings: List<String>) {
-        Log.d("mytag", "setStrings {" + strings.size + "}")
-        for (s in strings){
-            Log.d("mytag", s)
-        }
         this.strings = strings
         notifyDataSetChanged()
     }
 
     override fun getItemCount() = strings.size
 
+    fun select(index: Int){
+        val prevSelected = selectedItem
+        selectedItem = index
+        updateTextColor(recyclerView.findViewHolderForAdapterPosition(prevSelected), false)
+        updateTextColor(recyclerView.findViewHolderForAdapterPosition(selectedItem), true)
+    }
+
     fun unselect(){
         notifyItemChanged(selectedItem)
         selectedItem = -1
+    }
+
+    private fun updateTextColor(viewHolder: RecyclerView.ViewHolder?, isSelected: Boolean) {
+        if (viewHolder != null){
+            viewHolder as ViewHolder
+            if (isSelected)
+                viewHolder.stringItemView.setTextColor(Color.RED)
+            else
+                viewHolder.stringItemView.setTextColor(Color.WHITE)
+        }
     }
 }
