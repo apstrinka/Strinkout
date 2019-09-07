@@ -1,20 +1,14 @@
 package net.strinka.strinkout
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
     private var tts : TextToSpeech? = null;
@@ -71,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun customWorkoutsButton(view: View){
-        val intent = Intent(this, CustomWorkouts::class.java)
+        val intent = Intent(this, CustomWorkoutsActivity::class.java)
         startActivity(intent)
     }
 

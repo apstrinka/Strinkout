@@ -6,13 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
-import android.widget.EditText
+import android.widget.*
 
-class NewCustomWorkout : AppCompatActivity() {
+class NewCustomWorkoutActivity : AppCompatActivity() {
+    private val selected = emptyList<String>().toMutableList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_custom_workout)
+
+        val spinner = findViewById<Spinner>(R.id.add_exercise_spinner)
+        val array = allExercises.values.map { it.name }.toTypedArray()
+        spinner.adapter = ArrayAdapter<String>(this, R.layout.array_adapter_test, array)
     }
 
     fun finishButton(view: View){
@@ -26,7 +31,20 @@ class NewCustomWorkout : AppCompatActivity() {
             setResult(Activity.RESULT_OK, replyIntent)
         }
         finish()
+    }
 
+    fun addExerciseButton(view: View) {
+        val spinner = findViewById<Spinner>(R.id.add_exercise_spinner)
+        val item = spinner.selectedItem
+
+        if (item != null) {
+
+            selected.add(item.toString())
+            val array = selected.toTypedArray()
+
+            val list = findViewById<ListView>(R.id.custom_workout_exercise_list)
+            list.adapter = ArrayAdapter(this, R.layout.array_adapter_test, array)
+        }
     }
 
     companion object {

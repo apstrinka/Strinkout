@@ -2,20 +2,16 @@ package net.strinka.strinkout
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.ListView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomWorkouts : AppCompatActivity() {
+class CustomWorkoutsActivity : AppCompatActivity() {
 
     private lateinit var customWorkoutViewModel: CustomWorkoutViewModel
     private lateinit var adapter: StringListAdapter
@@ -108,7 +104,7 @@ class CustomWorkouts : AppCompatActivity() {
     }
 
     fun newCustomWorkoutButton(view: View){
-        val intent = Intent(this, NewCustomWorkout::class.java)
+        val intent = Intent(this, NewCustomWorkoutActivity::class.java)
         startActivityForResult(intent, newCustomWorkoutRequestCode)
     }
 
@@ -127,7 +123,7 @@ class CustomWorkouts : AppCompatActivity() {
 
         if (requestCode == newCustomWorkoutRequestCode && resultCode == Activity.RESULT_OK){
             data?.let {
-                val name = it.getStringExtra(NewCustomWorkout.EXTRA_REPLY)
+                val name = it.getStringExtra(NewCustomWorkoutActivity.EXTRA_REPLY)
                 customWorkoutViewModel.insert(name)
             }
         }

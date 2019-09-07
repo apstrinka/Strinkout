@@ -15,7 +15,7 @@ class CustomWorkout(
 
 @Dao
 interface CustomWorkoutDao {
-    @Query("SELECT * from custom_workout WHERE removed = 0 ORDER BY ordinal ASC")
+    @Query("SELECT * FROM custom_workout WHERE removed = 0 ORDER BY ordinal ASC")
     fun getAllCustomWorkouts(): LiveData<List<CustomWorkout>>
 
     @Insert
