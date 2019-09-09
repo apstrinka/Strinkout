@@ -90,8 +90,6 @@ class CustomWorkoutsActivity : AppCompatActivity() {
 
         customWorkoutViewModel = ViewModelProviders.of(this).get(CustomWorkoutViewModel::class.java)
 
-
-
         val recyclerView = findViewById<RecyclerView>(R.id.custom_workouts_recycler_view)
         adapter = StringListAdapter(this, recyclerView)
         recyclerView.adapter = adapter
@@ -116,17 +114,6 @@ class CustomWorkoutsActivity : AppCompatActivity() {
         val selected = customWorkoutViewModel.allCustomWorkouts.value?.get(index)
         customWorkoutViewModel.remove(selected!!.customWorkoutId)
         adapter.unselect()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == newCustomWorkoutRequestCode && resultCode == Activity.RESULT_OK){
-            data?.let {
-                val name = it.getStringExtra(NewCustomWorkoutActivity.EXTRA_REPLY)
-                customWorkoutViewModel.insert(name)
-            }
-        }
     }
 
     companion object {

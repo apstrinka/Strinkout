@@ -30,10 +30,4 @@
         android:layout_weight="1"
         tools:listitem="@layout/recyclerview_item"/>
 
-    <!--<ListView
-        android:id="@+id/custom_workouts_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />-->
-
 </LinearLayout>

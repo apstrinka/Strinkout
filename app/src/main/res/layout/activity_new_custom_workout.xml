@@ -30,19 +30,26 @@
 
     </LinearLayout>
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/custom_workout_exercise_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        tools:listitem="@layout/recyclerview_item"/>
+
+    <!--<ListView
         android:id="@+id/custom_workout_exercise_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_weight="1" />-->
 
     <Spinner
         android:id="@+id/add_exercise_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
-        android:background="@color/colorBlack"
-        android:popupBackground="@color/colorBlack"/>
+        android:background="@color/colorDarkGray"
+        android:popupBackground="@color/colorDarkGray"/>
 
     <Button
         android:layout_width="wrap_content"

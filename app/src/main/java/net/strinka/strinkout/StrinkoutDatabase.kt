@@ -1,14 +1,14 @@
 package net.strinka.strinkout
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.annotation.WorkerThread
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import kotlinx.coroutines.CoroutineScope
 
-@Database(entities = [CustomWorkout::class], version = 1)
+@Database(entities = [CustomWorkout::class, CustomWorkoutExercise::class], version = 1)
 public abstract class StrinkoutDatabase : RoomDatabase() {
-    abstract fun customWorkoutDao(): CustomWorkoutDao
+    abstract fun strinkoutDao(): StrinkoutDao
 
     companion object {
         @Volatile
@@ -21,5 +21,94 @@ public abstract class StrinkoutDatabase : RoomDatabase() {
                 instance
             }
         }
+    }
+}
+
+@Dao
+interface StrinkoutDao {
+    @Query("SELECT * FROM custom_workout WHERE removed = 0 ORDER BY ordinal ASC")
+    fun getAllCustomWorkouts(): LiveData<List<CustomWorkout>>
+
+    @Insert
+    suspend fun insert(customWorkout: CustomWorkout): Long
+
+    @Query("UPDATE custom_workout SET ordinal = ordinal + :shift WHERE ordinal >= :minIndex AND ordinal <= :maxIndex")
+    suspend fun reOrder(minIndex: Int, maxIndex: Int, shift: Int)
+
+    @Update
+    suspend fun update(customWorkout: CustomWorkout)
+
+    @Query("SELECT custom_workout_id FROM custom_workout WHERE rowid = :rowId")
+    suspend fun getWorkoutId(rowId: Long): Int
+
+    @Transaction
+    suspend fun move(customWorkout: CustomWorkout, toOrdinal: Int){
+        val fromOrdinal = customWorkout.ordinal
+        if (fromOrdinal == toOrdinal)
+            return
+        if (fromOrdinal < toOrdinal)
+            reOrder(fromOrdinal+1, toOrdinal, -1)
+        else if (fromOrdinal > toOrdinal)
+            reOrder(toOrdinal, fromOrdinal-1, 1)
+
+        val newCustomWorkout = CustomWorkout(customWorkout.customWorkoutId, customWorkout.name, toOrdinal, customWorkout.removed)
+        update(newCustomWorkout)
+    }
+
+    @Query("UPDATE custom_workout SET removed = 1 WHERE custom_workout_id = :customWorkoutId")
+    fun remove(customWorkoutId: Int)
+
+    @Query("SELECT MAX(ordinal) from custom_workout")
+    fun getMaxWorkoutOrdinal(): Int
+
+    @Query("SELECT * FROM custom_workout_exercise WHERE custom_workout_id = :customWorkoutId")
+    fun getExercisesFromWorkout(customWorkoutId: Int) : LiveData<List<CustomWorkoutExercise>>
+
+    @Insert
+    suspend fun insert(customWorkoutExercise: CustomWorkoutExercise)
+
+    @Query("SELECT MAX(ordinal) from custom_workout_exercise where custom_workout_id = :customWorkoutId")
+    fun getMaxExerciseOrdinal(customWorkoutId: Int): Int
+
+    @Transaction
+    suspend fun createWorkout(workout: Workout){
+        val maxOrdinal = getMaxWorkoutOrdinal()
+        val customWorkout = CustomWorkout(0, workout.name, maxOrdinal+1, false)
+        val rowid = insert(customWorkout)
+        val customWorkoutId = getWorkoutId(rowid)
+
+        var index = 0
+        for (exercise in workout.exercises){
+            val customWorkoutExercise = CustomWorkoutExercise(0, customWorkoutId, exercise.id, index)
+            insert(customWorkoutExercise)
+            index += 1
+        }
+    }
+}
+
+class StrinkoutRepository(private val strinkoutDao: StrinkoutDao) {
+    val allCustomWorkouts = strinkoutDao.getAllCustomWorkouts()
+
+    @WorkerThread
+    suspend fun move(customWorkout: CustomWorkout, toOrdinal: Int){
+        strinkoutDao.move(customWorkout, toOrdinal)
+    }
+
+    @WorkerThread
+    suspend fun remove(customWorkoutId: Int){
+        strinkoutDao.remove(customWorkoutId)
+    }
+
+    fun getExercise(customWorkoutExercise: CustomWorkoutExercise): Exercise? {
+        return allExercises[customWorkoutExercise.exerciseId]
+    }
+
+    fun getExercises(customWorkoutExercises: List<CustomWorkoutExercise>): List<Exercise> {
+        return customWorkoutExercises.map { getExercise(it) }.filterNotNull()
+    }
+
+    @WorkerThread
+    suspend fun createWorkout(workout: Workout){
+        strinkoutDao.createWorkout(workout)
     }
 }

@@ -8,17 +8,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CustomWorkoutViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: CustomWorkoutRepository
+    private val repository: StrinkoutRepository
     val allCustomWorkouts: LiveData<List<CustomWorkout>>
 
     init {
-        val dao = StrinkoutDatabase.getDatabase(application, viewModelScope).customWorkoutDao()
-        repository = CustomWorkoutRepository(dao)
+        val dao = StrinkoutDatabase.getDatabase(application, viewModelScope).strinkoutDao()
+        repository = StrinkoutRepository(dao)
         allCustomWorkouts = repository.allCustomWorkouts
-    }
-
-    fun insert (name: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(name)
     }
 
     fun moveItem(from: Int, to: Int) = viewModelScope.launch(Dispatchers.IO) {
@@ -26,10 +22,6 @@ class CustomWorkoutViewModel(application: Application) : AndroidViewModel(applic
         val workoutTo = allCustomWorkouts.value!![to]
         val toOrdinal = workoutTo.ordinal
         repository.move(workoutFrom, toOrdinal)
-    }
-
-    fun update(customWorkout: CustomWorkout) = viewModelScope.launch(Dispatchers.IO) {
-        repository.update(customWorkout)
     }
 
     fun remove(customWorkoutId: Int) = viewModelScope.launch(Dispatchers.IO) {
