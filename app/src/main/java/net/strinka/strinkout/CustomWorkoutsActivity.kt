@@ -1,6 +1,5 @@
 package net.strinka.strinkout
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,9 +10,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+const val MESSAGE_CUSTOM_WORKOUT_ID = "net.strinka.strinkout.MESSAGE_CUSTOM_WORKOUT_ID"
+
 class CustomWorkoutsActivity : AppCompatActivity() {
 
-    private lateinit var customWorkoutViewModel: CustomWorkoutViewModel
+    private lateinit var customWorkoutsViewModel: CustomWorkoutsViewModel
     private lateinit var adapter: StringListAdapter
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(
@@ -51,7 +52,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
                 super.clearView(recyclerView, viewHolder)
 
                 if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo)
-                    customWorkoutViewModel.moveItem(dragFrom, dragTo)
+                    customWorkoutsViewModel.moveItem(dragFrom, dragTo)
                 dragFrom = -1
                 dragTo = -1
             }
@@ -88,7 +89,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_custom_workouts)
 
-        customWorkoutViewModel = ViewModelProviders.of(this).get(CustomWorkoutViewModel::class.java)
+        customWorkoutsViewModel = ViewModelProviders.of(this).get(CustomWorkoutsViewModel::class.java)
 
         val recyclerView = findViewById<RecyclerView>(R.id.custom_workouts_recycler_view)
         adapter = StringListAdapter(this, recyclerView)
@@ -96,23 +97,35 @@ class CustomWorkoutsActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        customWorkoutViewModel.allCustomWorkouts.observe(this, Observer { customWorkouts ->
+        customWorkoutsViewModel.allCustomWorkouts.observe(this, Observer { customWorkouts ->
             adapter.setStrings(customWorkouts.map { it.name } )
         })
     }
 
     fun newCustomWorkoutButton(view: View){
-        val intent = Intent(this, NewCustomWorkoutActivity::class.java)
+        val intent = Intent(this, EditCustomWorkoutActivity::class.java)
+        intent.putExtra(MESSAGE_CUSTOM_WORKOUT_ID, 0)
+        startActivityForResult(intent, newCustomWorkoutRequestCode)
+    }
+
+    fun editSelectedWorkoutButton(view: View){
+        val index = adapter.selectedItem
+        if (index < 0)
+            return
+
+        val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
+        val intent = Intent(this, EditCustomWorkoutActivity::class.java)
+        intent.putExtra(MESSAGE_CUSTOM_WORKOUT_ID, selected!!.customWorkoutId)
         startActivityForResult(intent, newCustomWorkoutRequestCode)
     }
 
     fun removeSelectedWorkoutButton(view: View){
         val index = adapter.selectedItem
         if (index < 0)
-            return;
+            return
 
-        val selected = customWorkoutViewModel.allCustomWorkouts.value?.get(index)
-        customWorkoutViewModel.remove(selected!!.customWorkoutId)
+        val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
+        customWorkoutsViewModel.remove(selected!!.customWorkoutId)
         adapter.unselect()
     }
 

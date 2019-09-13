@@ -29,6 +29,9 @@ interface StrinkoutDao {
     @Query("SELECT * FROM custom_workout WHERE removed = 0 ORDER BY ordinal ASC")
     fun getAllCustomWorkouts(): LiveData<List<CustomWorkout>>
 
+    @Query("SELECT * FROM custom_workout WHERE custom_workout_id = :customWorkoutId")
+    fun getCustomWorkout(customWorkoutId: Int): CustomWorkout?
+
     @Insert
     suspend fun insert(customWorkout: CustomWorkout): Long
 
@@ -37,6 +40,9 @@ interface StrinkoutDao {
 
     @Update
     suspend fun update(customWorkout: CustomWorkout)
+
+    @Query("UPDATE custom_workout SET name = :name WHERE custom_workout_id = :customWorkoutId")
+    suspend fun updateCustomWorkoutName(customWorkoutId: Int, name: String)
 
     @Query("SELECT custom_workout_id FROM custom_workout WHERE rowid = :rowId")
     suspend fun getWorkoutId(rowId: Long): Int
@@ -62,13 +68,16 @@ interface StrinkoutDao {
     fun getMaxWorkoutOrdinal(): Int
 
     @Query("SELECT * FROM custom_workout_exercise WHERE custom_workout_id = :customWorkoutId")
-    fun getExercisesFromWorkout(customWorkoutId: Int) : LiveData<List<CustomWorkoutExercise>>
+    fun getExercisesFromWorkout(customWorkoutId: Int) : List<CustomWorkoutExercise>
 
     @Insert
     suspend fun insert(customWorkoutExercise: CustomWorkoutExercise)
 
-    @Query("SELECT MAX(ordinal) from custom_workout_exercise where custom_workout_id = :customWorkoutId")
+    @Query("SELECT MAX(ordinal) from custom_workout_exercise WHERE custom_workout_id = :customWorkoutId")
     fun getMaxExerciseOrdinal(customWorkoutId: Int): Int
+
+    @Query("DELETE FROM custom_workout_exercise WHERE custom_workout_id = :customWorkoutId")
+    suspend fun removeExercisesFromWorkout(customWorkoutId: Int)
 
     @Transaction
     suspend fun createWorkout(workout: Workout){
@@ -76,6 +85,19 @@ interface StrinkoutDao {
         val customWorkout = CustomWorkout(0, workout.name, maxOrdinal+1, false)
         val rowid = insert(customWorkout)
         val customWorkoutId = getWorkoutId(rowid)
+
+        var index = 0
+        for (exercise in workout.exercises){
+            val customWorkoutExercise = CustomWorkoutExercise(0, customWorkoutId, exercise.id, index)
+            insert(customWorkoutExercise)
+            index += 1
+        }
+    }
+
+    @Transaction
+    suspend fun updateWorkout(customWorkoutId: Int, workout: Workout){
+        updateCustomWorkoutName(customWorkoutId, workout.name)
+        removeExercisesFromWorkout(customWorkoutId)
 
         var index = 0
         for (exercise in workout.exercises){
@@ -99,6 +121,12 @@ class StrinkoutRepository(private val strinkoutDao: StrinkoutDao) {
         strinkoutDao.remove(customWorkoutId)
     }
 
+    @WorkerThread
+    suspend fun getExercises(customWorkoutId: Int): List<Exercise> {
+        val customWorkoutExercises = strinkoutDao.getExercisesFromWorkout(customWorkoutId)
+        return getExercises(customWorkoutExercises)
+    }
+
     fun getExercise(customWorkoutExercise: CustomWorkoutExercise): Exercise? {
         return allExercises[customWorkoutExercise.exerciseId]
     }
@@ -108,7 +136,17 @@ class StrinkoutRepository(private val strinkoutDao: StrinkoutDao) {
     }
 
     @WorkerThread
+    suspend fun getCustomWorkout(customWorkoutId: Int): CustomWorkout?{
+        return strinkoutDao.getCustomWorkout(customWorkoutId)
+    }
+
+    @WorkerThread
     suspend fun createWorkout(workout: Workout){
         strinkoutDao.createWorkout(workout)
+    }
+
+    @WorkerThread
+    suspend fun updateWorkout(customWorkoutId: Int, workout: Workout){
+        strinkoutDao.updateWorkout(customWorkoutId, workout)
     }
 }

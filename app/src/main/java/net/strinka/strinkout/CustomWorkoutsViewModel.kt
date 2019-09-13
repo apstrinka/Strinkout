@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CustomWorkoutViewModel(application: Application) : AndroidViewModel(application) {
+class CustomWorkoutsViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: StrinkoutRepository
     val allCustomWorkouts: LiveData<List<CustomWorkout>>
 
