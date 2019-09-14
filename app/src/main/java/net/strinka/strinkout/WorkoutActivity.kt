@@ -13,10 +13,12 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProviders
 import java.io.File
 import java.util.*
 
 class WorkoutActivity : AppCompatActivity() {
+    private lateinit var workoutViewModel: WorkoutViewModel
     private var tts : TextToSpeech? = null;
     private var exerciseMillis: Long = 30000
     private var introMillis: Long = 7000
@@ -38,6 +40,8 @@ class WorkoutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout)
+
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
         val imageView = findViewById<ImageView>(R.id.workout_animation)
         imageView.setBackgroundResource(R.drawable.test_animation)
@@ -72,11 +76,21 @@ class WorkoutActivity : AppCompatActivity() {
         updateTotalTime(totalTimeLeft);
         updateCurrentTime(introMillis);
 
+        val isCustomWorkout = intent.getBooleanExtra(MESSAGE_WORKOUT_CUSTOM, false)
         val workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
         val workout = defaultWorkouts[workoutIndex]
-        title = workout.name
-        exerciseList = ExerciseList(workout, shuffle)
-        findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
+
+        workoutViewModel.getWorkout(workoutIndex, isCustomWorkout).invokeOnCompletion {
+            runOnUiThread {
+                val workout = workoutViewModel.workout
+                if (workout != null) {
+                    title = workout.name
+                    exerciseList = ExerciseList(workout, shuffle)
+                    findViewById<TextView>(R.id.next_exercise).text = exerciseList.nextExercise.name
+                    findViewById<Button>(R.id.start_button).isEnabled = true
+                }
+            }
+        }
     }
 
     override fun onStop() {

@@ -70,9 +70,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun selectWorkout(workoutIndex: Int) {
-        val intent = Intent(this, SelectionActivity::class.java).apply {
-            putExtra(MESSAGE_WORKOUT, workoutIndex)
-        }
+        val intent = Intent(this, SelectionActivity::class.java)
+        intent.putExtra(MESSAGE_WORKOUT_CUSTOM, false)
+        intent.putExtra(MESSAGE_WORKOUT, workoutIndex)
         startActivity(intent)
     }
 }

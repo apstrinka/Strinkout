@@ -129,6 +129,18 @@ class CustomWorkoutsActivity : AppCompatActivity() {
         adapter.unselect()
     }
 
+    fun selectWorkoutButton(view: View){
+        val index = adapter.selectedItem
+        if (index < 0)
+            return
+
+        val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
+        val intent = Intent(this, SelectionActivity::class.java)
+        intent.putExtra(MESSAGE_WORKOUT_CUSTOM, true)
+        intent.putExtra(MESSAGE_WORKOUT, selected!!.customWorkoutId)
+        startActivity(intent)
+    }
+
     companion object {
         const val newCustomWorkoutRequestCode = 1
     }

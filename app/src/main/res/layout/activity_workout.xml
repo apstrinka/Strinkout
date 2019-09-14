@@ -146,7 +146,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="start"
-                android:text="Start" />
+                android:text="Start"
+                android:enabled="false"/>
 
             <Button
                 android:id="@+id/pause_button"
