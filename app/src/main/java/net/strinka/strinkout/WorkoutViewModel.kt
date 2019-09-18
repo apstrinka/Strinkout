@@ -21,7 +21,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         workout = repository.getWorkout(workoutId)
         if (workout == null) {
             exercises = emptyList()
-        } else {to
+        } else {
             exercises = repository.getExercises(workoutId)
         }
         workout?.exercises = exercises
