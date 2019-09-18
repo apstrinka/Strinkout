@@ -19,7 +19,7 @@ class StringListAdapter internal constructor(context: Context, recyclerView: Rec
         val stringItemView: TextView = itemView.findViewById<TextView>(R.id.stringView)
 
         init {
-            itemView.setOnClickListener { _ ->
+            itemView.setOnClickListener {
                 notifyItemChanged(selectedItem)
                 if (selectedItem == layoutPosition)
                     selectedItem = -1

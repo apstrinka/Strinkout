@@ -65,7 +65,7 @@ class History{
     }
 
     fun forceReload(){
-        loaded = false;
+        loaded = false
         loadRecords()
     }
 

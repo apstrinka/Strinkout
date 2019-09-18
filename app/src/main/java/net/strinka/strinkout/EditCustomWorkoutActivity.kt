@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +25,9 @@ class EditCustomWorkoutActivity : AppCompatActivity() {
         editCustomWorkoutViewModel = ViewModelProviders.of(this).get(EditCustomWorkoutViewModel::class.java)
 
         val spinner = findViewById<Spinner>(R.id.add_exercise_spinner)
-        val array = allExercises.values.toTypedArray()
-        spinner.adapter = ArrayAdapter<Exercise>(this, R.layout.array_adapter_test, array)
+        editCustomWorkoutViewModel.allExercises.observe(this, Observer { exercises ->
+            spinner.adapter = ArrayAdapter<Exercise>(this, R.layout.array_adapter_test, exercises.toTypedArray())
+        })
 
         val recyclerView = findViewById<RecyclerView>(R.id.custom_workout_exercise_recycler_view)
         recyclerViewAdapter = StringListAdapter(this, recyclerView)
@@ -90,7 +92,7 @@ class EditCustomWorkoutActivity : AppCompatActivity() {
             return
         }
 
-        val workout = Workout(name, exercises.toList())
+        val workout = Workout(0, name, true, 0, false, exercises.toList())
         if(customWorkoutId == 0) {
             editCustomWorkoutViewModel.createWorkout(workout)
         } else {
@@ -106,9 +108,5 @@ class EditCustomWorkoutActivity : AppCompatActivity() {
         val replyIntent = Intent()
         setResult(Activity.RESULT_CANCELED, replyIntent)
         finish()
-    }
-
-    companion object {
-        const val EXTRA_REPLY = "com.example.android.wordlistsql.REPLY"
     }
 }

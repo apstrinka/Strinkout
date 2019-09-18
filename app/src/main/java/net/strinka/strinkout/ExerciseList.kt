@@ -4,7 +4,7 @@ class ExerciseList{
     private var exercises: MutableList<Exercise>
     private val shuffle: Boolean
     private var index: Int = 0
-    var currentExercise: Exercise = Exercise(-1, "Test", false)
+    var currentExercise: Exercise = Exercise(0, "Test", false)
     var nextExercise: Exercise
 
     constructor(){

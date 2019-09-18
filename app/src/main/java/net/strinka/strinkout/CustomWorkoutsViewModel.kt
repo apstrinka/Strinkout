@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class CustomWorkoutsViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: StrinkoutRepository
-    val allCustomWorkouts: LiveData<List<CustomWorkout>>
+    val allCustomWorkouts: LiveData<List<Workout>>
 
     init {
         val dao = StrinkoutDatabase.getDatabase(application, viewModelScope).strinkoutDao()

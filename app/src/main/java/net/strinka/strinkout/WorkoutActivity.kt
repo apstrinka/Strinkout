@@ -19,7 +19,7 @@ import java.util.*
 
 class WorkoutActivity : AppCompatActivity() {
     private lateinit var workoutViewModel: WorkoutViewModel
-    private var tts : TextToSpeech? = null;
+    private var tts : TextToSpeech? = null
     private var exerciseMillis: Long = 30000
     private var introMillis: Long = 7000
     private var transitionMillis: Long = 5000
@@ -51,7 +51,7 @@ class WorkoutActivity : AppCompatActivity() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         exerciseMillis = Math.max(preferences.getInt("exercise_seconds", 30).toLong(), 10)*1000
         transitionMillis = Math.max(preferences.getInt("transition_seconds", 5).toLong(), 1)*1000
-        introMillis = transitionMillis + 2000;
+        introMillis = transitionMillis + 2000
         hasRests = preferences.getBoolean("has_rests", true)
         restSeconds =  Math.max(preferences.getInt("rest_seconds", 30), 5)
         restMillis = restSeconds.toLong()*1000
@@ -64,7 +64,7 @@ class WorkoutActivity : AppCompatActivity() {
         val initListener = TextToSpeech.OnInitListener {
             fun onInit(status: Int) {
                 if (status != TextToSpeech.ERROR) {
-                    tts?.setLanguage(Locale.US);
+                    tts?.setLanguage(Locale.US)
                     tts?.setSpeechRate(0.6f)
                 }
             }
@@ -73,14 +73,12 @@ class WorkoutActivity : AppCompatActivity() {
         val message = intent.getStringExtra(MESSAGE_TIME)
         totalTime = message.toLong()*60000
         totalTimeLeft = totalTime
-        updateTotalTime(totalTimeLeft);
-        updateCurrentTime(introMillis);
+        updateTotalTime(totalTimeLeft)
+        updateCurrentTime(introMillis)
 
-        val isCustomWorkout = intent.getBooleanExtra(MESSAGE_WORKOUT_CUSTOM, false)
         val workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
-        val workout = defaultWorkouts[workoutIndex]
 
-        workoutViewModel.getWorkout(workoutIndex, isCustomWorkout).invokeOnCompletion {
+        workoutViewModel.getWorkout(workoutIndex).invokeOnCompletion {
             runOnUiThread {
                 val workout = workoutViewModel.workout
                 if (workout != null) {
@@ -161,7 +159,7 @@ class WorkoutActivity : AppCompatActivity() {
 
         if (doesCurrentActivityCount()){
             totalTimeLeft -= elapsed
-            updateTotalTime(totalTimeLeft);
+            updateTotalTime(totalTimeLeft)
         }
 
         if (currentActivityType == ActivityType.TRANSITION){
@@ -191,7 +189,7 @@ class WorkoutActivity : AppCompatActivity() {
 
     private val onTick = fun(millisElapsed: Long){
         var millisLeft = currentActivityDuration - millisElapsed
-        updateCurrentTime(millisLeft);
+        updateCurrentTime(millisLeft)
         if (currentActivityType == ActivityType.INTRO){
             var totalTimeProgressBar = findViewById<ProgressBar>(R.id.total_time_progress)
             var currentTimeProgressBar = findViewById<ProgressBar>(R.id.current_time_progress)
@@ -199,7 +197,7 @@ class WorkoutActivity : AppCompatActivity() {
         }
         if (doesCurrentActivityCount()){
             var totalMillisLeft = totalTimeLeft - millisElapsed
-            updateTotalTime(totalMillisLeft);
+            updateTotalTime(totalMillisLeft)
         }
     }
 
@@ -210,7 +208,7 @@ class WorkoutActivity : AppCompatActivity() {
 
         if (doesCurrentActivityCount()){
             totalTimeLeft -= currentActivityDuration
-            updateTotalTime(totalTimeLeft);
+            updateTotalTime(totalTimeLeft)
             if (totalTimeLeft <= 0){
                 finishWorkout()
                 return
@@ -241,7 +239,7 @@ class WorkoutActivity : AppCompatActivity() {
         updateCurrentTimeColor(R.color.colorBlue)
         timeSpentWorkingOut += currentActivityDuration
         totalTimeLeft -= currentActivityDuration
-        updateTotalTime(totalTimeLeft);
+        updateTotalTime(totalTimeLeft)
         currentActivityType = ActivityType.TRANSITION
         currentActivityDuration = transitionMillis
         findViewById<TextView>(R.id.current_activity).text = "Switch sides"
@@ -348,13 +346,13 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun updateTotalTime(millisLeft: Long){
         findViewById<TextView>(R.id.total_time_remaing).text = millisToString(millisLeft)
-        findViewById<ProgressBar>(R.id.total_time_progress).progress = ((totalTime - millisLeft)*1000 / totalTime).toInt();
+        findViewById<ProgressBar>(R.id.total_time_progress).progress = ((totalTime - millisLeft)*1000 / totalTime).toInt()
     }
 
     private fun updateCurrentTime(millisLeft: Long){
         findViewById<TextView>(R.id.current_time_remaing).text = millisToString(millisLeft)
         if (currentActivityDuration == 0L)
-            findViewById<ProgressBar>(R.id.current_time_progress).progress = 0;
+            findViewById<ProgressBar>(R.id.current_time_progress).progress = 0
         else {
             val progress = ((currentActivityDuration - millisLeft)*1000 / currentActivityDuration).toInt()
             findViewById<ProgressBar>(R.id.current_time_progress).progress = progress

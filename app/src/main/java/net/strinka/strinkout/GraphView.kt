@@ -17,7 +17,7 @@ class GraphView(context: Context, attributeSet: AttributeSet) : View(context, at
         val can = canvas!!
         val paint = Paint()
         paint.color = Color.BLACK
-        can.drawRect(Rect(0, 0, width, height), paint);
+        can.drawRect(Rect(0, 0, width, height), paint)
 
         if (barValues.isNotEmpty()) {
 

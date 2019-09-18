@@ -11,25 +11,22 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProviders
 
-const val MESSAGE_WORKOUT_CUSTOM = "net.strinka.strinkout.MESSAGE_WORKOUT_CUSTOM"
 const val MESSAGE_WORKOUT = "net.strinka.strinkout.MESSAGE_WORKOUT"
 const val MESSAGE_TIME = "net.strinka.strinkout.MESSAGE_TIME"
 const val MESSAGE_COMPLETED = "net.strinka.strinkout.MESSAGE_COMPLETED"
 
 class SelectionActivity : AppCompatActivity() {
     private lateinit var workoutViewModel: WorkoutViewModel
-    var isCustomWorkout = false
     var workoutIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selection)
-        isCustomWorkout = intent.getBooleanExtra(MESSAGE_WORKOUT_CUSTOM, false)
         workoutIndex = intent.getIntExtra(MESSAGE_WORKOUT, 0)
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
-        workoutViewModel.getWorkout(workoutIndex, isCustomWorkout).invokeOnCompletion {
+        workoutViewModel.getWorkout(workoutIndex).invokeOnCompletion {
             runOnUiThread {
                 val workout = workoutViewModel.workout
                 if (workout != null){
@@ -47,9 +44,8 @@ class SelectionActivity : AppCompatActivity() {
         val message = time.text.toString()
         val intent = Intent(this, WorkoutActivity::class.java).apply {
             putExtra(MESSAGE_TIME, message)
-            putExtra(MESSAGE_WORKOUT_CUSTOM, isCustomWorkout)
             putExtra(MESSAGE_WORKOUT, workoutIndex)
         }
-        startActivity(intent);
+        startActivity(intent)
     }
 }

@@ -16,31 +16,26 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         repository = StrinkoutRepository(strinkoutDao)
     }
 
-    fun getWorkout(workoutId: Int, isCustomWorkout: Boolean): Job = viewModelScope.launch(Dispatchers.IO) {
-        if (!isCustomWorkout){
-            workout = defaultWorkouts[workoutId]
-            return@launch
+    fun getWorkout(workoutId: Int): Job = viewModelScope.launch(Dispatchers.IO) {
+
+        workout = repository.getWorkout(workoutId)
+        if (workout == null) {
+            exercises = emptyList()
+        } else {to
+            exercises = repository.getExercises(workoutId)
         }
-
-        val customWorkout = repository.getCustomWorkout(workoutId)
-        if (customWorkout == null) {
-            workout = null
-            return@launch
-        }
-
-        val exercises = repository.getExercises(workoutId)
-        workout = Workout(customWorkout.name, exercises)
+        workout?.exercises = exercises
     }
 
-    fun getExercises(customWorkoutId: Int): Job = viewModelScope.launch(Dispatchers.IO) {
-        exercises = repository.getExercises(customWorkoutId)
-    }
-
-    fun createWorkout(workout: Workout) = viewModelScope.launch(Dispatchers.IO) {
-        repository.createWorkout(workout)
-    }
-
-    fun updateWorkout(customWorkoutId: Int, workout: Workout) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateWorkout(customWorkoutId, workout)
-    }
+//    fun getExercises(customWorkoutId: Int): Job = viewModelScope.launch(Dispatchers.IO) {
+//        exercises = repository.getExercises(customWorkoutId)
+//    }
+//
+//    fun createWorkout(workout: Workout) = viewModelScope.launch(Dispatchers.IO) {
+//        repository.createWorkout(workout)
+//    }
+//
+//    fun updateWorkout(customWorkoutId: Int, workout: Workout) = viewModelScope.launch(Dispatchers.IO) {
+//        repository.updateWorkout(customWorkoutId, workout)
+//    }
 }

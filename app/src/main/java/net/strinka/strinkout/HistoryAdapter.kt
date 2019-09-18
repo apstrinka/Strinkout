@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 
-public class HistoryAdapter : ArrayAdapter<Record>{
+class HistoryAdapter : ArrayAdapter<Record>{
     private val resource: Int
     private val records: List<Record>
 

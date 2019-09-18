@@ -78,7 +78,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                TODO("not implemented") //Not used
             }
         }
 
@@ -115,7 +115,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
 
         val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
         val intent = Intent(this, EditCustomWorkoutActivity::class.java)
-        intent.putExtra(MESSAGE_CUSTOM_WORKOUT_ID, selected!!.customWorkoutId)
+        intent.putExtra(MESSAGE_CUSTOM_WORKOUT_ID, selected!!.workoutId)
         startActivityForResult(intent, newCustomWorkoutRequestCode)
     }
 
@@ -125,7 +125,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
             return
 
         val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
-        customWorkoutsViewModel.remove(selected!!.customWorkoutId)
+        customWorkoutsViewModel.remove(selected!!.workoutId)
         adapter.unselect()
     }
 
@@ -136,8 +136,7 @@ class CustomWorkoutsActivity : AppCompatActivity() {
 
         val selected = customWorkoutsViewModel.allCustomWorkouts.value?.get(index)
         val intent = Intent(this, SelectionActivity::class.java)
-        intent.putExtra(MESSAGE_WORKOUT_CUSTOM, true)
-        intent.putExtra(MESSAGE_WORKOUT, selected!!.customWorkoutId)
+        intent.putExtra(MESSAGE_WORKOUT, selected!!.workoutId)
         startActivity(intent)
     }
 
