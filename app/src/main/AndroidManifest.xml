@@ -9,14 +9,44 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".EditCustomWorkoutActivity"
+        <activity
+            android:name=".CardioWorkoutsActivity"
+            android:parentActivityName=".CustomWorkoutsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.CustomWorkoutsActivity" />
+        </activity>
+        <activity
+            android:name=".LowerBodyWorkoutsActivity"
+            android:parentActivityName=".CustomWorkoutsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.CustomWorkoutsActivity" />
+        </activity>
+        <activity
+            android:name=".CoreWorkoutsActivity"
+            android:parentActivityName=".CustomWorkoutsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.CustomWorkoutsActivity" />
+        </activity>
+        <activity
+            android:name=".UpperBodyWorkoutsActivity"
+            android:parentActivityName=".CustomWorkoutsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.strinka.strinkout.CustomWorkoutsActivity" />
+        </activity>
+        <activity
+            android:name=".EditCustomWorkoutActivity"
             android:label="New Custom Workout"
             android:parentActivityName=".CustomWorkoutsActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.strinka.strinkout.CustomWorkoutsActivity" />
         </activity>
-        <activity android:name=".CustomWorkoutsActivity"
+        <activity
+            android:name=".CustomWorkoutsActivity"
             android:label="Custom Workouts"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -47,6 +77,7 @@
         </activity>
         <activity
             android:name=".SelectionActivity"
+            android:label="Selected Workout"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

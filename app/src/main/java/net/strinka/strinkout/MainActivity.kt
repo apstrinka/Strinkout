@@ -48,29 +48,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun selectStandard(view: View){
-        selectWorkout(1)
+        selectWorkout(this, 2)
     }
 
     fun selectBeginner(view: View){
-        selectWorkout(2)
+        selectWorkout(this, 1)
     }
 
     fun selectAdvanced(view: View){
-        selectWorkout(3)
+        selectWorkout(this, 3)
     }
 
     fun selectQuiet(view: View){
-        selectWorkout(4)
+        selectWorkout(this, 4)
+    }
+
+    fun selectUpperBody(view: View){
+        val intent = Intent(this, UpperBodyWorkoutsActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun selectCore(view: View){
+        val intent = Intent(this, CoreWorkoutsActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun selectLowerBody(view: View){
+        val intent = Intent(this, LowerBodyWorkoutsActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun selectCardio(view: View){
+        val intent = Intent(this, CardioWorkoutsActivity::class.java)
+        startActivity(intent)
     }
 
     fun customWorkoutsButton(view: View){
         val intent = Intent(this, CustomWorkoutsActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun selectWorkout(workoutId: Int) {
-        val intent = Intent(this, SelectionActivity::class.java)
-        intent.putExtra(MESSAGE_WORKOUT, workoutId)
         startActivity(intent)
     }
 }
